@@ -179,7 +179,7 @@ public partial class Recipes
                 (analogCircuit,1L),
                 ("tin cable",3L),
             },
-            new[] { (redstoneBattery, 1L) }
+            new[] { (basicMachineHull, 1L) }
         );
 
         transformers = Recipe.Values.Select(x => new ResourceTransformer(x)).ToArray();

@@ -41,11 +41,6 @@ public partial class Recipes
                 var info1 = n1.Get<IResourceTransformerInfo>("recipe");
                 var info2 = n2.Get<IResourceTransformerInfo>("recipe");
 
-                if (info1.OutputResources[0].resourceName == "steel rod" && info2.OutputResources[0].resourceName == "steel ring")
-                {
-                    System.Console.WriteLine('a');
-                }
-
                 var canBeMoved = info1.OutputResources.Select(x => x.resourceName).Intersect(info2.InputResources.Select(x => x.resourceName)).ToArray();
                 foreach (var resource in canBeMoved)
                 {

@@ -12,14 +12,14 @@ public class Main : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         var r = recipes;
-        var result = r.BuildRecipe(r.Recipe[r.robotArm], 1);
+        var result = r.BuildRecipe(r.Recipe[r.basicMachineHull], 3);
         foreach (var l in result)
         {
             System.Console.WriteLine("-----------------");
             foreach (var rec in l)
             {
                 System.Console.WriteLine();
-                System.Console.WriteLine(rec.amount);
+                System.Console.WriteLine("Amount "+rec.amount);
                 System.Console.WriteLine(rec.transformer);
             }
         }
