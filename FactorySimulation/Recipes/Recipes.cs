@@ -13,18 +13,22 @@ public partial class Recipes
     public IResourceTransformer[] transformers;
     public Recipes(IEnumerable<IMetalPartRecipeFactory> metalPartRecipeFactories)
     {
+        //generate metal parts for following metals
         foreach (var m in new[] { "iron", "copper", "gold", "bronze", "steel", "aluminum", "invar", "battery alloy", "titanium", "stainless steel", "tin", "tungsten", "electrum", "platinum" })
         {
             foreach (var factory in metalPartRecipeFactories)
                 factory.AddRecipe(m, this);
         }
+
         Recipe[glass] = new ResourceTransformerInfo(
+            RawResource,
             new[]{
                 (glass,1L),
             },
             new[] { (glass, 1L) }
         );
         Recipe[glassPane] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 (glass,6L),
             },
@@ -32,6 +36,7 @@ public partial class Recipes
         );
 
         Recipe[motor] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 ("steel rod",2L),
                 (magneticSteelRod,1L),
@@ -41,13 +46,14 @@ public partial class Recipes
             new[] { (motor, 1L) }
         );
         Recipe[magneticSteelRod] = new ResourceTransformerInfo(
+            Polarizer,
             new[]{
                 ("steel rod",1L),
-                (redstone,6L),
             },
             new[] { (magneticSteelRod, 1L) }
         );
         Recipe[redstone] = new ResourceTransformerInfo(
+            RawResource,
             new[]{
                 (redstone,1L),
             },
@@ -55,6 +61,7 @@ public partial class Recipes
         );
 
         Recipe[rubber] = new ResourceTransformerInfo(
+            RawResource,
             new[]{
                 (rubber,1L),
             },
@@ -62,6 +69,7 @@ public partial class Recipes
         );
 
         Recipe[fluidPipe] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 ("copper rotor",2L),
                 (glassPane,2L),
@@ -71,6 +79,7 @@ public partial class Recipes
         );
 
         Recipe[pump] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 ("tin rotor",3L),
                 ("tin bolt",2L),
@@ -81,6 +90,7 @@ public partial class Recipes
         );
 
         Recipe[resistor] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 ("copper fine wire",2L),
                 (coalDust,1L),
@@ -90,6 +100,7 @@ public partial class Recipes
         );
 
         Recipe[inductor] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 ("steel rod",1L),
                 ("copper wire",8L),
@@ -98,6 +109,7 @@ public partial class Recipes
         );
 
         Recipe[analogCircuitBoard] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 ("copper plate",1L),
                 (rubber,2L),
@@ -106,6 +118,7 @@ public partial class Recipes
         );
 
          Recipe[analogCircuit] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 (resistor,2L),
                 ("copper wire",3L),
@@ -117,6 +130,7 @@ public partial class Recipes
         );
 
         Recipe[piston] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 ("steel gear",1L),
                 (motor,1L),
@@ -128,6 +142,7 @@ public partial class Recipes
         );
 
         Recipe[robotArm] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 (motor,2L),
                 (piston,1L),
@@ -138,6 +153,7 @@ public partial class Recipes
             new[] { (robotArm, 1L) }
         );
         Recipe[conveyer] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 (motor,2L),
                 (rubber,6L),
@@ -146,6 +162,7 @@ public partial class Recipes
             new[] { (conveyer, 1L) }
         );
         Recipe[redstoneBattery] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 ("battery alloy plate",1L),
                 ("battery alloy curved plate",4L),
@@ -155,6 +172,7 @@ public partial class Recipes
         );
 
         Recipe[basicMachineHull] = new ResourceTransformerInfo(
+            CraftingTable,
             new[]{
                 ("steel machine casing",1L),
                 (redstoneBattery,2L),
@@ -163,6 +181,7 @@ public partial class Recipes
             },
             new[] { (redstoneBattery, 1L) }
         );
+
         transformers = Recipe.Values.Select(x => new ResourceTransformer(x)).ToArray();
     }
 }

@@ -61,6 +61,7 @@ public partial class Recipes
 
             var commonSink = new Node(counter);
             commonSink.Properties["recipe"] = new ResourceTransformerInfo(
+                "commonSink",
                 new[] { ("total", 1L) },
                 new[] { ("total", 1L) }
             );

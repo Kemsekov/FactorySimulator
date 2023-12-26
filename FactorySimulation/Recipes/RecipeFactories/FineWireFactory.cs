@@ -3,6 +3,7 @@ namespace FactorySimulation;
 public class FineWireFactory : IMetalPartRecipeFactory{
     public void AddRecipe(string metal, Recipes recipes){
         recipes.Recipe[metal+" fine wire"] = new ResourceTransformerInfo(
+            recipes.Wiremill,
             new[]{
                 (metal+" wire",1L),
             },

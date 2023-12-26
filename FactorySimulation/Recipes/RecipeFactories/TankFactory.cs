@@ -3,6 +3,7 @@ namespace FactorySimulation;
 public class TankFactory : IMetalPartRecipeFactory{
     public void AddRecipe(string metal, Recipes recipes){
         recipes.Recipe[metal+" tank"] = new ResourceTransformerInfo(
+            recipes.CraftingTable,
             new[]{
                 (metal+" plate",8L),
                 ("glass",1L),

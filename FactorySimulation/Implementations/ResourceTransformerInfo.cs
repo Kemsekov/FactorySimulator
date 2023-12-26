@@ -6,7 +6,7 @@ using FactorySimulation.Interfaces;
 namespace FactorySimulation;
 
 ///<inheritdoc/>
-public record ResourceTransformerInfo((string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Price = 0) : IResourceTransformerInfo{
+public record ResourceTransformerInfo(string TransformationName,(string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Price = 0) : IResourceTransformerInfo{
     string serialize((string resourceName, long amount)[] data){
         return JsonSerializer.Serialize(data.Select(x=>new object[]{x.resourceName,x.amount}))[1..^1];
     }
@@ -14,8 +14,8 @@ public record ResourceTransformerInfo((string resourceName, long amount)[] Input
     public override string ToString()
     {
         if(InputResources.Zip(OutputResources).All(x=>x.First.resourceName==x.Second.resourceName && x.First.amount==x.Second.amount))
-            return $"\n\t{serialize(InputResources)}}}\n";
-        return $"\n\t{serialize(InputResources)}\n\t{serialize(OutputResources)}\n";
+            return $"{TransformationName}\n{serialize(InputResources)}";
+        return $"{TransformationName}\n{serialize(InputResources)}\n{serialize(OutputResources)}\nTime: {Time}";
     }
     /// <summary>
     /// Converts this object to json
@@ -30,7 +30,8 @@ public record ResourceTransformerInfo((string resourceName, long amount)[] Input
         var OutputResources = (obj["OutputResources"] as IEnumerable<dynamic> ?? throw new ArgumentException("Missing array OutputResources")).Select(i=>((string)i["resourceName"],(long)i["amount"]));
         var Time = (long)obj["Time"];
         var Price = (long)obj["Price"];
-        return new ResourceTransformerInfo(InputResources.ToArray(),OutputResources.ToArray(),Time,Price);
+        var TransformationName = (string)obj["TransformationName"];
+        return new ResourceTransformerInfo(TransformationName,InputResources.ToArray(),OutputResources.ToArray(),Time,Price);
     }
     /// <summary>
     /// Converts many resources from single json string.<br/>

@@ -9,6 +9,12 @@ namespace FactorySimulation;
 /// </summary>
 public partial class Recipes
 {
+    public string CuttingMachine = "Cutting machine";
+    public string CraftingTable = "Crafting table";
+    public string Polarizer = "Polarizer";
+    public string RawResource = "Raw resource";
+    public string Compressor = "Compressor";
+    public string Wiremill ="Wiremill";
     public string magneticSteelRod = "magnetic steel rod";
     public string rubber = "rubber";
     public string redstone = "redstone";
@@ -29,5 +35,4 @@ public partial class Recipes
     public string conveyer = "conveyer";
     public string redstoneBattery = "redstone battery";
     public string basicMachineHull = "basic machine hull";
-
 }

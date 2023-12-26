@@ -18,11 +18,11 @@ public class Main : IHostedService
             System.Console.WriteLine("-----------------");
             foreach (var rec in l)
             {
+                System.Console.WriteLine();
                 System.Console.WriteLine(rec.amount);
                 System.Console.WriteLine(rec.transformer);
             }
         }
-        
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

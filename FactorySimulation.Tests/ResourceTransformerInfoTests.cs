@@ -6,6 +6,7 @@ public class ResourceTransformerInfoTests
     public void JsonConvert()
     {
         var res = new ResourceTransformerInfo(
+            "Machine1",
             InputResources: new[]{
                 ("A",1L),
                 ("B",2)
@@ -20,6 +21,7 @@ public class ResourceTransformerInfoTests
 
         var json = res.ToJson();
         var converted = ResourceTransformerInfo.FromJson(json);
+        Assert.Equal(res.TransformationName, converted.TransformationName);
         Assert.Equal(res.InputResources, converted.InputResources);
         Assert.Equal(res.OutputResources, converted.OutputResources);
         Assert.Equal(res.Time, converted.Time);
@@ -29,6 +31,7 @@ public class ResourceTransformerInfoTests
     public void JsonConvertMany()
     {
         var res1 = new ResourceTransformerInfo(
+            "Machine1",
             InputResources: new[]{
                 ("A1",11L),
                 ("B1",22)
@@ -41,6 +44,7 @@ public class ResourceTransformerInfoTests
             Price: 13
         );
         var res2 = new ResourceTransformerInfo(
+            "Machine2",
             InputResources: new[]{
                 ("A2",43L),
                 ("B2",314)
@@ -53,6 +57,7 @@ public class ResourceTransformerInfoTests
             Price: 42
         );
         var res3 = new ResourceTransformerInfo(
+            "Machine3",
             InputResources: new[]{
                 ("A3",413L),
                 ("B3",314)
@@ -70,6 +75,7 @@ public class ResourceTransformerInfoTests
 
         foreach (var (p1, p2) in arr.Zip(converted))
         {
+            Assert.Equal(p1.TransformationName, p2.TransformationName);
             Assert.Equal(p1.InputResources, p2.InputResources);
             Assert.Equal(p1.OutputResources, p2.OutputResources);
             Assert.Equal(p1.Time, p2.Time);
