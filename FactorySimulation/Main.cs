@@ -12,7 +12,7 @@ public class Main : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         var r = recipes;
-        var result = r.BuildRecipe(r.Recipe[r.basicMachineHull], 3);
+        var result = r.BuildRecipe(r.Recipe[r.basicMachineHull], 1);
         foreach (var l in result)
         {
             System.Console.WriteLine("-----------------");
@@ -23,6 +23,17 @@ public class Main : IHostedService
                 System.Console.WriteLine(rec.transformer);
             }
         }
+        var machinesNeeded = 
+            result
+            .SelectMany(R=>R)
+            .GroupBy(t=>t.transformer.TransformationName)
+            .Select(c=>new{c.First().transformer.TransformationName,Amount=c.Count()})
+            .OrderBy(t=>t.Amount);
+        System.Console.WriteLine("Summary of machines needed:\n");
+        foreach(var m in machinesNeeded){
+            System.Console.WriteLine(m.TransformationName+" "+m.Amount);
+        }
+        
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
