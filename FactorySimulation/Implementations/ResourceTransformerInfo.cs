@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FactorySimulation.Interfaces;
@@ -30,6 +31,16 @@ public record ResourceTransformerInfo((string resourceName, long amount)[] Input
         var Time = (long)obj["Time"];
         var Price = (long)obj["Price"];
         return new ResourceTransformerInfo(InputResources.ToArray(),OutputResources.ToArray(),Time,Price);
+    }
+    /// <summary>
+    /// Converts many resources from single json string.<br/>
+    /// </summary>
+    /// <param name="json">Contains single array objects that can be converted by <see cref="ResourceTransformerInfo.FromJson(string)"/> </param>
+    /// <returns></returns>
+    public static IResourceTransformerInfo[] ManyFromJson(string json){
+        dynamic obj = Newtonsoft.Json.JsonConvert.DeserializeObject(json) ?? throw new ArgumentException("Possible empty json string");
+        var many = obj as IEnumerable<dynamic> ?? throw new ArgumentException("Json does not contains top level array");
+        return many.Select(str=>FromJson((string)str)).ToArray();
     }
 };
 
