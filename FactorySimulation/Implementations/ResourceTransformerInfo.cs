@@ -16,6 +16,21 @@ public record ResourceTransformerInfo((string resourceName, long amount)[] Input
             return $"\n\t{serialize(InputResources)}}}\n";
         return $"\n\t{serialize(InputResources)}\n\t{serialize(OutputResources)}\n";
     }
+    /// <summary>
+    /// Converts this object to json
+    /// </summary>
+    public string ToJson() => ResourceTransformerInfoExtensions.ToJson(this);
+    /// <summary>
+    /// Creates resource transformer from json
+    /// </summary>
+    public static IResourceTransformerInfo FromJson(string json){
+        dynamic obj = Newtonsoft.Json.JsonConvert.DeserializeObject(json) ?? throw new ArgumentException("Possible empty json string");
+        var InputResources =  (obj["InputResources"] as IEnumerable<dynamic>  ?? throw new ArgumentException("Missing array InputResources")).Select(i=>((string)i["resourceName"],(long)i["amount"]));
+        var OutputResources = (obj["OutputResources"] as IEnumerable<dynamic> ?? throw new ArgumentException("Missing array OutputResources")).Select(i=>((string)i["resourceName"],(long)i["amount"]));
+        var Time = (long)obj["Time"];
+        var Price = (long)obj["Price"];
+        return new ResourceTransformerInfo(InputResources.ToArray(),OutputResources.ToArray(),Time,Price);
+    }
 };
 
 
