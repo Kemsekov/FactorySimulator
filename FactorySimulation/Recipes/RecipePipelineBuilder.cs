@@ -12,11 +12,21 @@ public partial class Recipes
     /// <summary>
     /// Builds required recipe information of how to reproduce it, 
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="preferredRecipes"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public List<List<(IResourceTransformerInfo transformer, long amount)>> BuildRecipe(IResourceTransformerInfo what, long amount)
+    /// <param name="resultGraph">
+    /// Resulting resources movement graph.<br/>
+    /// Each node represents recipe. <br/>
+    /// Each node have properties <br/> 
+    /// "recipe" of type <see cref="IResourceTransformerInfo"/> which contain recipe <br/>
+    /// "amount" of <see cref="long"/> which contains amount of this recipe reproducers needed <br/>
+    /// Each edge have properties <br/>
+    /// "resource" of type <see cref="string"/> which contains resource name that is moved trough this edge <br/>
+    /// "moved_amount" of type <see cref="string"/> which contains amount of moved resource from one node to another
+    /// </param>
+    /// <param name="what">What to reproduce</param>
+    /// <returns>
+    /// Topologically sorted chain of transformations
+    /// </returns>
+    public List<List<(IResourceTransformerInfo transformer, long amount)>> BuildRecipe(IResourceTransformerInfo what, long amount,out Graph resultGraph)
     {
         Graph<Node, Edge> G = new Graph();
         ResourceTransformerInfo recipe(int nodeId) => G.Nodes[nodeId].Get<ResourceTransformerInfo>("recipe");
@@ -63,7 +73,6 @@ public partial class Recipes
                 {
                     var edge = new Edge(n2, n1);
                     edge.Properties["resource"] = resource;
-                    edge.Properties["executed"] = false;
                     G.Edges.Add(edge);
                 }
             }
@@ -89,13 +98,11 @@ public partial class Recipes
             {
                 var edge = new Edge(s, commonSink);
                 edge.Properties["resource"] = "total";
-                edge.Properties["executed"] = true;
                 G.Edges.Add(edge);
             }
 
             var connector = new Edge(commonSink.Id, recipeToId[what]);
             connector.Properties["resource"] = "total";
-            connector.Properties["executed"] = true;
             G.Edges.Add(connector);
 
             // after we looped back raw resources with root resource
@@ -118,6 +125,9 @@ public partial class Recipes
             G.SetSources(edges: G.Do.Induce(allowedNodes).Edges);
             G.Do.RemoveIsolatedNodes();
         }
+
+        var productionLines = new DefaultEdgeSource<Edge>();
+        var productionUnits = new DefaultNodeSource<Node>();
 
         // repeatedly reconstruct required amount of resources for 
         // each source(end-tier resource) of graph. One by one.
@@ -143,30 +153,48 @@ public partial class Recipes
                     var targetAmount = target.Get<long>("amount");
                     var sourceRecipe = source.Get<IResourceTransformerInfo>("recipe");
                     var targetRecipe = target.Get<IResourceTransformerInfo>("recipe");
-                    //how much of resource `res` we need to put into target
+                    //how much of resource `res` we need to put into target in one sec
                     var resourcesNeeded =
-                        targetRecipe.InputResources
+                        1.0*targetRecipe.InputResources
                         .First(x => x.resourceName == res)
-                        .amount * targetAmount;
+                        .amount * targetAmount/targetRecipe.Time;
                     
-                    //how much of resource `res` is produced in source
+                    //how much of resource `res` is produced in source in one sec
                     var produced = 
-                        sourceRecipe.OutputResources
+                        1.0*sourceRecipe.OutputResources
                         .First(x => x.resourceName == res)
-                        .amount;
+                        .amount/sourceRecipe.Time;
                     
                     // required amount with time 
-                    var requiredAmount = (long)Math.Ceiling(1.0*sourceRecipe.Time/produced*resourcesNeeded/targetRecipe.Time);
+                    var requiredAmount = (long)Math.Ceiling(1.0*resourcesNeeded/produced);
 
                     source.Properties["amount"] = requiredAmount + sourceAmount;
                     G.Edges.Remove(e);
+
+                    // save amount of resourced moved by edge
+                    e.Properties["moved_amount"] = requiredAmount;
+                    // and save resulting graph edge
+                    productionLines.Add(e);
                 }
                 G.Nodes.Remove(n);
+
+                // save resulting graph nodes
+                productionUnits.Add(n);
             }
             G.Do.RemoveIsolatedNodes();
         }
 
-        var result = layers.Select(x => x.Select(x => (x.Get<IResourceTransformerInfo>("recipe"), x.Get<long>("amount"))).ToList()).ToList();
+        var result = layers
+            .Select(
+                x => 
+                x.Select(
+                    x => 
+                    (x.Get<IResourceTransformerInfo>("recipe"), x.Get<long>("amount")))
+                    .OrderBy(t=>t.Item2)
+                    .ToList())
+            .ToList();
+        resultGraph = new Graph();
+        resultGraph.SetSources(productionUnits,productionLines);
         return result;
     }
 }

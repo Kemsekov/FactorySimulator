@@ -14,7 +14,7 @@ public class Main : IHostedService
         var r = recipes;
 
         var recipe = r.Recipe[r.basicMachineHull];
-        var result = r.BuildRecipe(recipe, 1);
+        var result = r.BuildRecipe(recipe, 1,out var _);
         foreach (var l in result)
         {
             System.Console.WriteLine("-----------------");
