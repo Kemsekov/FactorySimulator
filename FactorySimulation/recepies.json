@@ -1,8 +1,17 @@
-[
-    {
-        
-    },
-    {
-
-    }
-]
+{
+    "TransformationName": "Macerator",
+    "InputResources": [
+        {
+            "resourceName": "aluminum",
+            "amount": 1
+        }
+    ],
+    "OutputResources": [
+        {
+            "resourceName": "aluminum dust",
+            "amount": 1
+        }
+    ],
+    "Time": 1,
+    "Price": 0
+}

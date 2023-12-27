@@ -26,13 +26,12 @@ public static class RecipePipelineBuilder
     /// <returns>
     /// Topologically sorted chain of transformations
     /// </returns>
-    public static List<List<(IResourceTransformerInfo transformer, double amount)>> BuildRecipe(this IDictionary<string, IResourceTransformerInfo> recipes_, IResourceTransformerInfo what, double amount,out Graph resultGraph)
+    public static List<List<(IResourceTransformerInfo transformer, double amount)>> BuildRecipe(this IEnumerable<IResourceTransformerInfo> recipes, IResourceTransformerInfo what, double amount,out Graph resultGraph)
     {
         Graph<Node, Edge> G = new Graph();
         ResourceTransformerInfo recipe(int nodeId) => G.Nodes[nodeId].Get<ResourceTransformerInfo>("recipe");
         //enumerate recipes and assign indices
-        var recipeToId = recipes_.Values.ToDictionary(x => x, x => -1);
-        var recipes = recipes_.Values;
+        var recipeToId = recipes.ToDictionary(x => x, x => -1);
         int counter = 0;
         foreach (var r in recipes)
         {

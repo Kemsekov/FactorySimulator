@@ -41,7 +41,7 @@ public record ResourceTransformerInfo(string TransformationName,(string resource
     public static IResourceTransformerInfo[] ManyFromJson(string json){
         dynamic obj = Newtonsoft.Json.JsonConvert.DeserializeObject(json) ?? throw new ArgumentException("Possible empty json string");
         var many = obj as IEnumerable<dynamic> ?? throw new ArgumentException("Json does not contains top level array");
-        return many.Select(str=>FromJson((string)str)).ToArray();
+        return many.Select(str=>FromJson((string)str.ToString())).ToArray();
     }
 };
 
