@@ -14,7 +14,20 @@ public class Main : IHostedService
         var r = recipes;
 
         var recipe = r.Recipe[r.basicMachineHull];
-        var result = r.BuildRecipe(recipe, 1,out var _);
+        recipe = new ResourceTransformerInfo(
+            TransformationName: "Result",
+            InputResources: new[]{
+                (recipes.ElectricCompressor,1L),
+                (recipes.ElectricCuttingMachine,2L),
+                (recipes.ElectricMixer,1L),
+                (recipes.ElectricWiremill,3L),
+            },
+            OutputResources: new[]{
+                ("result",1L)
+            });
+
+        var result = r.Recipe.BuildRecipe(recipe, 1,out var G);
+
         foreach (var l in result)
         {
             System.Console.WriteLine("-----------------");
@@ -47,8 +60,8 @@ public class Main : IHostedService
             System.Console.WriteLine(m.TransformationName+" "+m.Amount);
         }
         System.Console.WriteLine("-----------------");
-
-
+        System.Console.WriteLine("Recipies used: "+G.Nodes.Count);
+        System.Console.WriteLine("Resource movements: "+G.Edges.Count);
         
     }
 

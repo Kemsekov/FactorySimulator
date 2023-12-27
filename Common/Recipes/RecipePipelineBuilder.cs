@@ -7,7 +7,7 @@ using GraphSharp.Visitors;
 using ILGPU.Runtime;
 using System.Linq;
 namespace FactorySimulation;
-public partial class Recipes
+public static class RecipePipelineBuilder
 {
     /// <summary>
     /// Builds required recipe information of how to reproduce it, 
@@ -26,19 +26,19 @@ public partial class Recipes
     /// <returns>
     /// Topologically sorted chain of transformations
     /// </returns>
-    public List<List<(IResourceTransformerInfo transformer, long amount)>> BuildRecipe(IResourceTransformerInfo what, long amount,out Graph resultGraph)
+    public static List<List<(IResourceTransformerInfo transformer, double amount)>> BuildRecipe(this IDictionary<string, IResourceTransformerInfo> recipes_, IResourceTransformerInfo what, double amount,out Graph resultGraph)
     {
         Graph<Node, Edge> G = new Graph();
         ResourceTransformerInfo recipe(int nodeId) => G.Nodes[nodeId].Get<ResourceTransformerInfo>("recipe");
         //enumerate recipes and assign indices
-        var recipeToId = Recipe.Values.ToDictionary(x => x, x => -1);
-        var recipes = Recipe.Values;
+        var recipeToId = recipes_.Values.ToDictionary(x => x, x => -1);
+        var recipes = recipes_.Values;
         int counter = 0;
         foreach (var r in recipes)
         {
             var n = new Node(counter);
             n.Properties["recipe"] = r;
-            n.Properties["amount"] = 0L;
+            n.Properties["amount"] = 0.0;
             recipeToId[r] = counter;
             counter++;
             G.Nodes.Add(n);
@@ -47,7 +47,7 @@ public partial class Recipes
         if(!recipeToId.ContainsKey(what)){
             var n = new Node(counter);
             n.Properties["recipe"] = what;
-            n.Properties["amount"] = 0L;
+            n.Properties["amount"] = 0.0;
             recipeToId[what] = counter;
             counter++;
             G.Nodes.Add(n);
@@ -91,7 +91,7 @@ public partial class Recipes
                 new[] { ("total", 1L) },
                 new[] { ("total", 1L) }
             );
-            commonSink.Properties["amount"] = 0L;
+            commonSink.Properties["amount"] = 0.0;
             counter++;
             G.Nodes.Add(commonSink);
             foreach (var s in sinks)
@@ -149,8 +149,8 @@ public partial class Recipes
                     var source = G.Nodes[e.TargetId];
                     var target = G.Nodes[e.SourceId];
 
-                    var sourceAmount = source.Get<long>("amount");
-                    var targetAmount = target.Get<long>("amount");
+                    var sourceAmount = source.Get<double>("amount");
+                    var targetAmount = target.Get<double>("amount");
                     var sourceRecipe = source.Get<IResourceTransformerInfo>("recipe");
                     var targetRecipe = target.Get<IResourceTransformerInfo>("recipe");
                     //how much of resource `res` we need to put into target in one sec
@@ -159,22 +159,35 @@ public partial class Recipes
                         .First(x => x.resourceName == res)
                         .amount * targetAmount/targetRecipe.Time;
                     
-                    //how much of resource `res` is produced in source in one sec
+                    //how much of resource `res` one source produce in one sec
                     var produced = 
                         1.0*sourceRecipe.OutputResources
                         .First(x => x.resourceName == res)
                         .amount/sourceRecipe.Time;
+
+                    // find how much of resource `res` is already produced and not consumed yet.
+                    // it is equal to:
+                    // available = source.Amount*produced - sum( out edges of source with resource `res`)
+                    // so can reduce resourcesNeeded=resourcesNeeded-available
+
+                    var available = 
+                        source.Get<double>("amount")*produced-
+                        productionLines.InEdges(source.Id).Sum(se=>se.Get<double>("moved_amount"));
                     
-                    // required amount with time 
-                    var requiredAmount = (long)Math.Ceiling(1.0*resourcesNeeded/produced);
+                    resourcesNeeded-=available;
+
+                    // required amount of sources needed to fulfill resources needs of target
+                    // in one sec
+                    var requiredAmount = 1.0*resourcesNeeded/produced;
 
                     source.Properties["amount"] = requiredAmount + sourceAmount;
-                    G.Edges.Remove(e);
 
-                    // save amount of resourced moved by edge
-                    e.Properties["moved_amount"] = requiredAmount;
+                    // save amount of resource `res` moved by edge in one sec
+                    e.Properties["moved_amount"] = resourcesNeeded;
                     // and save resulting graph edge
                     productionLines.Add(e);
+                    G.Edges.Remove(e);
+
                 }
                 G.Nodes.Remove(n);
 
@@ -189,7 +202,7 @@ public partial class Recipes
                 x => 
                 x.Select(
                     x => 
-                    (x.Get<IResourceTransformerInfo>("recipe"), x.Get<long>("amount")))
+                    (x.Get<IResourceTransformerInfo>("recipe"), x.Get<double>("amount")))
                     .OrderBy(t=>t.Item2)
                     .ToList())
             .ToList();
