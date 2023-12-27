@@ -4,8 +4,8 @@ public static class ResourceTransformerInfoExtensions
     public static string ToJson(this IResourceTransformerInfo t)
         => Newtonsoft.Json.JsonConvert.SerializeObject(new{
             t.TransformationName,
-            InputResources=t.InputResources.Select(i=>new{i.resourceName,i.amount}),
-            OutputResources=t.OutputResources.Select(i=>new{i.resourceName,i.amount}),
+            InputResources=t.InputResources.Select(i=>new[]{i.resourceName,i.amount.ToString()}),
+            OutputResources=t.OutputResources.Select(i=>new[]{i.resourceName,i.amount.ToString()}),
             t.Time,
             t.Price
         });

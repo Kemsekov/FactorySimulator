@@ -26,8 +26,8 @@ public record ResourceTransformerInfo(string TransformationName,(string resource
     /// </summary>
     public static IResourceTransformerInfo FromJson(string json){
         dynamic obj = Newtonsoft.Json.JsonConvert.DeserializeObject(json) ?? throw new ArgumentException("Possible empty json string");
-        var InputResources =  (obj["InputResources"] as IEnumerable<dynamic>  ?? throw new ArgumentException("Missing array InputResources")).Select(i=>((string)i["resourceName"],(long)i["amount"]));
-        var OutputResources = (obj["OutputResources"] as IEnumerable<dynamic> ?? throw new ArgumentException("Missing array OutputResources")).Select(i=>((string)i["resourceName"],(long)i["amount"]));
+        var InputResources =  (obj["InputResources"] as IEnumerable<dynamic>  ?? throw new ArgumentException("Missing array InputResources")).Select(i=>((string)i[0],(long)i[1]));
+        var OutputResources = (obj["OutputResources"] as IEnumerable<dynamic> ?? throw new ArgumentException("Missing array OutputResources")).Select(i=>((string)i[0],(long)i[1]));
         var Time = (long)obj["Time"];
         var Price = (long)obj["Price"];
         var TransformationName = (string)obj["TransformationName"];

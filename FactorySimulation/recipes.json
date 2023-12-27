@@ -2,32 +2,14 @@
     {
         "TransformationName": "Crafting table",
         "InputResources": [
-            {
-                "resourceName": "resistor",
-                "amount": 2
-            },
-            {
-                "resourceName": "copper wire",
-                "amount": 3
-            },
-            {
-                "resourceName": "analog circuit board",
-                "amount": 1
-            },
-            {
-                "resourceName": "capacitor",
-                "amount": 2
-            },
-            {
-                "resourceName": "inductor",
-                "amount": 1
-            }
+            ["resistor",2],
+            ["copper wire",3],
+            ["analog circuit board",1],
+            ["capacitor",2],
+            ["inductor",1]
         ],
         "OutputResources": [
-            {
-                "resourceName": "analog circuit",
-                "amount": 1
-            }
+            ["analog circuit",1]
         ],
         "Time": 1,
         "Price": 0
