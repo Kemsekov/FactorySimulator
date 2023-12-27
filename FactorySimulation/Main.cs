@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using GraphSharp;
+using GraphSharp.Graphs;
 
 namespace FactorySimulation;
 public class Main : IHostedService
@@ -26,6 +29,7 @@ public class Main : IHostedService
             });
 
         var result = r.Recipe.Values.BuildRecipe(recipe, 1,out var G);
+
         foreach (var l in result)
         {
             System.Console.WriteLine("-----------------");
@@ -60,6 +64,7 @@ public class Main : IHostedService
         System.Console.WriteLine("-----------------");
         System.Console.WriteLine("Recipies used: "+G.Nodes.Count);
         System.Console.WriteLine("Resource movements: "+G.Edges.Count);
+
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

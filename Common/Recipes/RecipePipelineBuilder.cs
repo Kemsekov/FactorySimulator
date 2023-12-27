@@ -126,7 +126,7 @@ public static class RecipePipelineBuilder
         }
 
         var productionLines = new DefaultEdgeSource<Edge>();
-        var productionUnits = new DefaultNodeSource<Node>();
+        var productionUnits = new DefaultNodeSource<Node>(G.Nodes);
 
         // repeatedly reconstruct required amount of resources for 
         // each source(end-tier resource) of graph. One by one.
@@ -186,12 +186,8 @@ public static class RecipePipelineBuilder
                     // and save resulting graph edge
                     productionLines.Add(e);
                     G.Edges.Remove(e);
-
                 }
                 G.Nodes.Remove(n);
-
-                // save resulting graph nodes
-                productionUnits.Add(n);
             }
             G.Do.RemoveIsolatedNodes();
         }
@@ -207,6 +203,7 @@ public static class RecipePipelineBuilder
             .ToList();
         resultGraph = new Graph();
         resultGraph.SetSources(productionUnits,productionLines);
+        resultGraph.Do.RemoveIsolatedNodes();
         return result;
     }
 }
