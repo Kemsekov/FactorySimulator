@@ -13,6 +13,10 @@ public partial class Recipes
     public IResourceTransformer[] transformers;
     public Recipes(IEnumerable<IMetalPartRecipeFactory> metalPartRecipeFactories,IEnumerable<IDustable> dustFactories)
     {
+        var recipes = ResourceTransformerInfo.ManyFromJson(File.ReadAllText("recipes.json"));
+        foreach(var r in recipes){
+            Recipe[r.OutputResources.First().resourceName]=r;
+        }
         //generate metal parts for following metals
         foreach (var m in Metals)
         {
@@ -122,14 +126,14 @@ public partial class Recipes
             new[] { (inductor, 1L) }
         );
 
-        Recipe[analogCircuitBoard] = new ResourceTransformerInfo(
-            CraftingTable,
-            new[]{
-                ("copper plate",1L),
-                (rubber,2L),
-            },
-            new[] { (analogCircuitBoard, 1L) }
-        );
+        // Recipe[analogCircuitBoard] = new ResourceTransformerInfo(
+        //     CraftingTable,
+        //     new[]{
+        //         ("copper plate",1L),
+        //         (rubber,2L),
+        //     },
+        //     new[] { (analogCircuitBoard, 1L) }
+        // );
 
          Recipe[analogCircuit] = new ResourceTransformerInfo(
             CraftingTable,

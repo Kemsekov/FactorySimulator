@@ -12,7 +12,6 @@ public class Main : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         var r = recipes;
-
         var recipe = r.Recipe[r.basicMachineHull];
         recipe = new ResourceTransformerInfo(
             TransformationName: "Result",
@@ -61,7 +60,6 @@ public class Main : IHostedService
         System.Console.WriteLine("-----------------");
         System.Console.WriteLine("Recipies used: "+G.Nodes.Count);
         System.Console.WriteLine("Resource movements: "+G.Edges.Count);
-        // System.Console.WriteLine(r.Recipe.Values.ToArray().ManyToJson());
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

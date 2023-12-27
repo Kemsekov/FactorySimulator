@@ -1,0 +1,35 @@
+[
+    {
+        "TransformationName": "Crafting table",
+        "InputResources": [
+            {
+                "resourceName": "resistor",
+                "amount": 2
+            },
+            {
+                "resourceName": "copper wire",
+                "amount": 3
+            },
+            {
+                "resourceName": "analog circuit board",
+                "amount": 1
+            },
+            {
+                "resourceName": "capacitor",
+                "amount": 2
+            },
+            {
+                "resourceName": "inductor",
+                "amount": 1
+            }
+        ],
+        "OutputResources": [
+            {
+                "resourceName": "analog circuit",
+                "amount": 1
+            }
+        ],
+        "Time": 1,
+        "Price": 0
+    }
+]
