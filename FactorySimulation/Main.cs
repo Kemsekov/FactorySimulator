@@ -12,7 +12,9 @@ public class Main : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         var r = recipes;
-        var result = r.BuildRecipe(r.Recipe[r.basicMachineHull], 1);
+
+        var recipe = r.Recipe[r.basicMachineHull];
+        var result = r.BuildRecipe(recipe, 1);
         foreach (var l in result)
         {
             System.Console.WriteLine("-----------------");
@@ -23,6 +25,17 @@ public class Main : IHostedService
                 System.Console.WriteLine(rec.transformer);
             }
         }
+
+        var raw = 
+            result
+            .SelectMany(R=>R)
+            .Where(t=>t.transformer.TransformationName==recipes.RawResource)
+            .OrderBy(t=>t.amount);
+        System.Console.WriteLine("Summary of raw resourced needed:\n");
+        foreach(var m in raw){
+            System.Console.WriteLine(m);
+        }
+
         var machinesNeeded = 
             result
             .SelectMany(R=>R)
@@ -33,6 +46,9 @@ public class Main : IHostedService
         foreach(var m in machinesNeeded){
             System.Console.WriteLine(m.TransformationName+" "+m.Amount);
         }
+        System.Console.WriteLine("-----------------");
+
+
         
     }
 

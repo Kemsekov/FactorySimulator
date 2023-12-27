@@ -13,6 +13,7 @@ public static class AppInstance
     public static void Configuration(HostBuilderContext context, IServiceCollection services)
     {
         services.AddSingletonFromAssembly<IMetalPartRecipeFactory>(typeof(IMetalPartRecipeFactory).Assembly);
+        services.AddSingletonFromAssembly<IDustable>(typeof(IDustable).Assembly);
         services.AddSingleton<Recipes>();
         services.AddHostedService<Main>();
     }

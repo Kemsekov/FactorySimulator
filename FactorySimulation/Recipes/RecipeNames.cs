@@ -10,7 +10,10 @@ namespace FactorySimulation;
 public partial class Recipes
 {
     public string CuttingMachine = "Cutting machine";
+    public string Mixer = "Mixer";
+    public string SteamBlastFurnace = "Steam blast furnace";
     public string CraftingTable = "Crafting table";
+    public string Macerator = "Macerator";
     public string Polarizer = "Polarizer";
     public string RawResource = "Raw resource";
     public string Compressor = "Compressor";
@@ -35,4 +38,18 @@ public partial class Recipes
     public string conveyer = "conveyer";
     public string redstoneBattery = "redstone battery";
     public string basicMachineHull = "basic machine hull";
+    public string invarRotaryBlade = "invar rotary blade";
+    public string ElectricCuttingMachine = "electric cutting machine";
+    public string ElectricWiremill = "electric wiremill";
+    public string ElectricCompressor = "electric compressor";
+    public string ElectricMixer = "electric mixer";
+    public string Assembler = "assembler";
+    public string Water = "water";
+    public string SolderingAlloy = "soldering alloy";
+    public string SolderingAlloyDust = "soldering alloy dust";
+    public string RawSyntheticOil = "raw synthetic oil";
+    public string SyntheticOil = "synthetic oil";
+    public string[] Metals = new[] { "iron", "copper", "gold", "bronze", "steel", "aluminum", "invar", "battery alloy", "titanium", "stainless steel", "tin", "tungsten", "electrum", "platinum","calorite" };
+    public string[] Rocks = new[] {"diamond","coal","raw uranium"};
+    public string[] Liquids = new[] {"water","soldering alloy", "raw synthetic oil","synthetic oil"};
 }

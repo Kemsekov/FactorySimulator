@@ -5,11 +5,11 @@ public class GearFactory : IMetalPartRecipeFactory{
         recipes.Recipe[metal+" gear"] = new ResourceTransformerInfo(
             recipes.CraftingTable,
             new[]{
-                (metal+" bolt",4L),
                 (metal+" plate",4L),
                 (metal+" ring",1L),
+                (recipes.SolderingAlloy,100L),
             },
-            new[]{(metal+" gear",1L)}
+            new[]{(metal+" gear",2L)}
         );
     }
 }
