@@ -256,20 +256,10 @@ public partial class Recipes
             new[] { (ElectricMixer, 1L) }
         );
 
-        Recipe[SolderingAlloyDust] = new ResourceTransformerInfo(
-            Mixer,
-            new[]{
-                ("lead dust",1L),
-                ("tin dust",1L),
-            },
-            new[] { (SolderingAlloyDust, 2L) }
-        );
         Recipe[SolderingAlloy] = new ResourceTransformerInfo(
-            SteamBlastFurnace,
-            new[]{
-                (SolderingAlloyDust,1L),
-            },
-            new[] { (SolderingAlloy, 111L) }
+            RawResource,
+            new[]{ (SolderingAlloy,1L) },
+            new[] { (SolderingAlloy, 1L) }
         );
 
         Recipe[Assembler] = new ResourceTransformerInfo(

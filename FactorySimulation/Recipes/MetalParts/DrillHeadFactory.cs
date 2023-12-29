@@ -8,10 +8,10 @@ public class DrillHeadFactory : IMetalPartRecipeFactory{
                 (metal+" plate",1L),
                 (metal+" curved plate",2L),
                 (metal+" rod",1L),
-                (metal+" bolt",3L),
                 (metal+" gear",2L),
+                (recipes.SolderingAlloy,75L),
             },
-            new[]{(metal+" drill head",4L)}
+            new[]{(metal+" drill head",1L)}
         );
     }
 }

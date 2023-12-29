@@ -26,7 +26,7 @@ public static class RecipePipelineBuilder
     /// <returns>
     /// Topologically sorted chain of transformations
     /// </returns>
-    public static List<List<(IResourceTransformerInfo transformer, double amount)>> BuildRecipe(this IEnumerable<IResourceTransformerInfo> recipes, IResourceTransformerInfo what, double amount,out Graph resultGraph)
+    public static (IResourceTransformerInfo transformer, double amount)[][] BuildRecipe(this IEnumerable<IResourceTransformerInfo> recipes, IResourceTransformerInfo what, double amount,out Graph resultGraph)
     {
         Graph<Node, Edge> G = new Graph();
         ResourceTransformerInfo recipe(int nodeId) => G.Nodes[nodeId].Get<ResourceTransformerInfo>("recipe");
@@ -75,8 +75,6 @@ public static class RecipePipelineBuilder
                     G.Edges.Add(edge);
                 }
             }
-        // Do topological sort starting from root node
-        var layers = G.Do.TopologicalSort(recipeToId[what]).Layers;
         // for each low-tier resource in production lines graph
         // create common sink and loop back it to root node.
         // low-tier means some resource that does not have recipe
@@ -192,18 +190,33 @@ public static class RecipePipelineBuilder
             G.Do.RemoveIsolatedNodes();
         }
 
-        var result = layers
+        
+        resultGraph = new Graph();
+        resultGraph.SetSources(productionUnits,productionLines);
+        resultGraph.Do.RemoveIsolatedNodes();
+
+        
+        // here we do topological sort
+        var clone = new Graph();
+        clone.SetSources(productionUnits.AsEnumerable(),productionLines);
+        var layers = new List<Node[]>();
+        while(clone.Nodes.Count>0){
+            var sources = clone.Nodes.Where(n=>clone.Edges.IsSink(n.Id)).ToArray();
+            layers.Add(sources);
+            clone.Do.RemoveNodes(sources.Select(n=>n.Id).ToArray());
+        }
+
+       var result = layers
             .Select(
                 x => 
                 x.Select(
                     x => 
                     (x.Get<IResourceTransformerInfo>("recipe"), x.Get<double>("amount")))
                     .OrderBy(t=>t.Item2)
-                    .ToList())
-            .ToList();
-        resultGraph = new Graph();
-        resultGraph.SetSources(productionUnits,productionLines);
-        resultGraph.Do.RemoveIsolatedNodes();
+                    .ToArray())
+            .Reverse()
+            .ToArray();
+
         return result;
     }
 }

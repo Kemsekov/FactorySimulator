@@ -13,5 +13,19 @@
         ],
         "Time": 1,
         "Price": 0
+    },
+    {
+        "TransformationName": "Crafting table",
+        "InputResources": [
+            ["bronze drill head",1],
+            ["iron gear",2],
+            ["item pipe",1],
+            ["fluid pipe",1]
+        ],
+        "OutputResources": [
+            ["bronze drill",4]
+        ],
+        "Time": 1,
+        "Price": 0
     }
 ]

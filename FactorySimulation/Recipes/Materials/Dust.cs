@@ -8,10 +8,8 @@ public interface IDustable{
 public class Dust : IDustable{
     public void AddRecipe(string material, Recipes recipes){
         recipes.Recipe[material+" dust"] = new ResourceTransformerInfo(
-            recipes.Macerator,
-            new[]{
-                (material,1L),
-            },
+            recipes.RawResource,
+            new[]{(material+" dust",1L)},
             new[]{(material+" dust",1L)}
         );
     }
