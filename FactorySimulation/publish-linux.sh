@@ -1,0 +1,1 @@
+dotnet publish -c Release -r linux-x64 -p:PublishSingleFile=True -p:TrimMode=CopyUsed -p:PublishReadyToRun=False -o publish/linux-x64

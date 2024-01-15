@@ -8,6 +8,5 @@
   <ItemGroup>
     <PackageReference Include="GradientDescentSharp" Version="0.0.9" />
     <PackageReference Include="Kemsekov.GraphSharp" Version="3.0.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>
