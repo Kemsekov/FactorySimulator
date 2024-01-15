@@ -1,1 +1,1 @@
-dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=True -p:PublishTrimmed=True -p:TrimMode=CopyUsed -p:PublishReadyToRun=False -o publish/win-x64
+dotnet publish -c Release -r win-x64 --self-contained -p:PublishTrimmed=True -p:PublishSingleFile=True -p:TrimMode=Link -p:PublishReadyToRun=False -o publish/win-x64

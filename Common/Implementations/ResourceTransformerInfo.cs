@@ -1,3 +1,4 @@
+#pragma warning disable
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,7 +11,7 @@ public record ResourceTransformerInfo(string TransformationName, (string resourc
 {
     string serialize((string resourceName, long amount)[] data)
     {
-        return JsonSerializer.Serialize(data.Select(x => new string[] { x.resourceName, x.amount.ToString() }))[1..^1];
+        return JsonSerializer.Serialize(data.Select(x => new string[] { x.resourceName, x.amount.ToString() }),ResourceTransformerInfoExtensions.jsonSerializerOptions())[1..^1];
         // return JsonSerializer.Serialize(data.Select(x=>new string[]{x.resourceName,x.amount.ToString()}))[1..^1];
     }
     ///<inheritdoc/>
@@ -29,7 +30,7 @@ public record ResourceTransformerInfo(string TransformationName, (string resourc
     /// </summary>
     public static IResourceTransformerInfo FromJson(string json)
     {
-        var values = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json) ?? throw new ArgumentException("Cannot deserialize json");
+        var values = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json,ResourceTransformerInfoExtensions.jsonSerializerOptions()) ?? throw new ArgumentException("Cannot deserialize json");
         return fromJsonDict(values);
     }
     static IResourceTransformerInfo fromJsonDict(Dictionary<string, JsonElement> values)
@@ -49,7 +50,7 @@ public record ResourceTransformerInfo(string TransformationName, (string resourc
     /// <returns></returns>
     public static IResourceTransformerInfo[] ManyFromJson(string json)
     {
-        var values = JsonSerializer.Deserialize<Dictionary<string, JsonElement>[]>(json) ?? throw new ArgumentException("Cannot deserialize json");
+        var values = JsonSerializer.Deserialize<Dictionary<string, JsonElement>[]>(json,ResourceTransformerInfoExtensions.jsonSerializerOptions()) ?? throw new ArgumentException("Cannot deserialize json");
         return values.Select(fromJsonDict).ToArray();
     }
 };

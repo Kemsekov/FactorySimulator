@@ -1,7 +1,11 @@
+#pragma warning disable
 using System.Text.Json;
 using FactorySimulation.Interfaces;
 public static class ResourceTransformerInfoExtensions
 {
+    public static JsonSerializerOptions jsonSerializerOptions()=>new(){
+            TypeInfoResolver=new RoflTypeInfoResolver()
+        };
     public static string ToJson(this IResourceTransformerInfo t){
         var dictValues = new Dictionary<string,object>();
 
@@ -11,7 +15,7 @@ public static class ResourceTransformerInfoExtensions
         dictValues["Time"]=t.Time;
         dictValues["Price"]=t.Price;
 
-        return JsonSerializer.Serialize(dictValues);
+        return JsonSerializer.Serialize(dictValues,jsonSerializerOptions());
     }
     /// <summary>
     /// Converts many resources from single json string.<br/>
