@@ -21,7 +21,7 @@ public class ResourceTransformerInfoTests
 
         var json = res.ToJson();
         var converted = ResourceTransformerInfo.FromJson(json);
-        Assert.Equal(res.TransformationName, converted.TransformationName);
+        Assert.Equal(res.Transformer, converted.Transformer);
         Assert.Equal(res.InputResources, converted.InputResources);
         Assert.Equal(res.OutputResources, converted.OutputResources);
         Assert.Equal(res.Time, converted.Time);
@@ -75,7 +75,7 @@ public class ResourceTransformerInfoTests
 
         foreach (var (p1, p2) in arr.Zip(converted))
         {
-            Assert.Equal(p1.TransformationName, p2.TransformationName);
+            Assert.Equal(p1.Transformer, p2.Transformer);
             Assert.Equal(p1.InputResources, p2.InputResources);
             Assert.Equal(p1.OutputResources, p2.OutputResources);
             Assert.Equal(p1.Time, p2.Time);

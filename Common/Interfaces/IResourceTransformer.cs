@@ -23,7 +23,7 @@ public interface IResourceTransformerInfo
     /// <summary>
     /// Name of transformation. Where this transformation happening? Maybe machine name that assembles some detail.
     /// </summary>
-    string TransformationName{get;}
+    string Transformer{get;}
 }
 
 /// <summary>

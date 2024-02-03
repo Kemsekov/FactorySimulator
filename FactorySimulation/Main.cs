@@ -23,7 +23,7 @@ public class Main : IHostedService
         var recipe = r.Recipe[r.basicMachineHull];
         // recipe = r.Recipe["bronze drill head"];
         recipe = new ResourceTransformerInfo(
-            TransformationName: "Result",
+            Transformer: "Result",
             InputResources: new[]{
                 (recipes.ElectricCompressor,1L),
                 (recipes.ElectricCuttingMachine,2L),
@@ -52,13 +52,13 @@ public class Main : IHostedService
         var machinesNeeded =
             result
             .SelectMany(R => R)
-            .GroupBy(t => t.transformer.TransformationName)
-            .Select(c => new { c.First().transformer.TransformationName, Amount = c.Count() })
+            .GroupBy(t => t.transformer.Transformer)
+            .Select(c => new { c.First().transformer.Transformer, Amount = c.Count() })
             .OrderBy(t => t.Amount);
         System.Console.WriteLine("Summary of machines needed:\n");
         foreach (var m in machinesNeeded)
         {
-            System.Console.WriteLine(m.TransformationName + " " + m.Amount);
+            System.Console.WriteLine(m.Transformer + " " + m.Amount);
         }
         System.Console.WriteLine("-----------------");
         System.Console.WriteLine("Recipies used: " + G.Nodes.Count);

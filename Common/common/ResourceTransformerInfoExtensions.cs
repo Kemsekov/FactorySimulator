@@ -9,7 +9,7 @@ public static class ResourceTransformerInfoExtensions
     public static string ToJson(this IResourceTransformerInfo t){
         var dictValues = new Dictionary<string,object>();
 
-        dictValues["TransformationName"]=t.TransformationName;
+        dictValues["Transformer"]=t.Transformer;
         dictValues["InputResources"]=t.InputResources.Select(i=>new object[]{i.resourceName,i.amount});
         dictValues["OutputResources"]=t.OutputResources.Select(i=>new object[]{i.resourceName,i.amount});
         dictValues["Time"]=t.Time;

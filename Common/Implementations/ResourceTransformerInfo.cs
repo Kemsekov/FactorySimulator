@@ -7,7 +7,7 @@ using FactorySimulation.Interfaces;
 namespace FactorySimulation;
 
 ///<inheritdoc/>
-public record ResourceTransformerInfo(string TransformationName, (string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Price = 0) : IResourceTransformerInfo
+public record ResourceTransformerInfo(string Transformer, (string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Price = 0) : IResourceTransformerInfo
 {
     string serialize((string resourceName, long amount)[] data)
     {
@@ -18,8 +18,8 @@ public record ResourceTransformerInfo(string TransformationName, (string resourc
     public override string ToString()
     {
         if (InputResources.Zip(OutputResources).All(x => x.First.resourceName == x.Second.resourceName && x.First.amount == x.Second.amount))
-            return $"{TransformationName}\n{serialize(InputResources)}";
-        return $"{TransformationName}\n{serialize(InputResources)}\n{serialize(OutputResources)}\nTime: {Time}";
+            return $"{Transformer}\n{serialize(InputResources)}";
+        return $"{Transformer}\n{serialize(InputResources)}\n{serialize(OutputResources)}\nTime: {Time}";
     }
     /// <summary>
     /// Converts this object to json
@@ -40,8 +40,8 @@ public record ResourceTransformerInfo(string TransformationName, (string resourc
         var OutputResources = values["OutputResources"].EnumerateArray().Select(res => (res[0].GetString() ?? throw resourceNameMustBeString, res[1].GetInt64()));
         var Time = values["Time"].GetInt64();
         var Price = values["Price"].GetInt64();
-        var TransformationName = values["TransformationName"].GetString() ?? throw new ArgumentException("Missing TransformationName variable");
-        return new ResourceTransformerInfo(TransformationName, InputResources.ToArray(), OutputResources.ToArray(), Time, Price);
+        var Transformer = values["Transformer"].GetString() ?? throw new ArgumentException("Missing Transformer variable");
+        return new ResourceTransformerInfo(Transformer, InputResources.ToArray(), OutputResources.ToArray(), Time, Price);
     }
     /// <summary>
     /// Converts many resources from single json string.<br/>
