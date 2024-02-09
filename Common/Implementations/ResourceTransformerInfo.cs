@@ -7,7 +7,7 @@ using FactorySimulation.Interfaces;
 namespace FactorySimulation;
 
 ///<inheritdoc/>
-public record ResourceTransformerInfo(string Transformer, (string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Price = 0) : IResourceTransformerInfo
+public record ResourceTransformerInfo(string Transformer, (string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Price = 1) : IResourceTransformerInfo
 {
     string serialize((string resourceName, long amount)[] data)
     {

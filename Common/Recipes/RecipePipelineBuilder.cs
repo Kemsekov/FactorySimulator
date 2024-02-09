@@ -1,11 +1,14 @@
 #pragma warning disable
 using FactorySimulation.Interfaces;
+using Google.OrTools.LinearSolver;
+using Google.OrTools.Sat;
 using GraphSharp;
 using GraphSharp.Graphs;
 using GraphSharp.Propagators;
 using GraphSharp.Visitors;
 using ILGPU.Runtime;
 using System.Linq;
+using System.Reflection;
 namespace FactorySimulation;
 public static class RecipePipelineBuilder
 {
@@ -28,8 +31,9 @@ public static class RecipePipelineBuilder
     /// </returns>
     public static (IResourceTransformerInfo transformer, double amount)[][] BuildRecipe(this IEnumerable<IResourceTransformerInfo> recipes, IResourceTransformerInfo what, double amount,out Graph resultGraph)
     {
-        Graph<Node, Edge> G = new Graph();
+        var G = new Graph();
         ResourceTransformerInfo recipe(int nodeId) => G.Nodes[nodeId].Get<ResourceTransformerInfo>("recipe");
+        recipes = recipes.Append(what).Distinct().ToList();
         //enumerate recipes and assign indices
         var recipeToId = recipes.ToDictionary(x => x, x => -1);
         int counter = 0;
@@ -42,18 +46,9 @@ public static class RecipePipelineBuilder
             counter++;
             G.Nodes.Add(n);
         }
-        //add resource that we need to build if it is not present among recipes
-        if(!recipeToId.ContainsKey(what)){
-            var n = new Node(counter);
-            n.Properties["recipe"] = what;
-            n.Properties["amount"] = 0.0;
-            recipeToId[what] = counter;
-            counter++;
-            G.Nodes.Add(n);
-        }
 
         //assign root resource amount
-        G.Nodes[recipeToId[what]].Properties["amount"] = amount;
+        G.Nodes[recipeToId[what]]["amount"] = amount;
         //connect all recipes that is connectable by production line
         //every possible recipe chain is gonna be subgraph of G
         foreach (var n1 in G.Nodes)
@@ -71,7 +66,7 @@ public static class RecipePipelineBuilder
                 foreach (var resource in canBeMoved)
                 {
                     var edge = new Edge(n2, n1);
-                    edge.Properties["resource"] = resource;
+                    edge["resource"] = resource;
                     G.Edges.Add(edge);
                 }
             }
@@ -83,23 +78,23 @@ public static class RecipePipelineBuilder
             var sinks = G.Nodes.Where(n => G.Edges.IsSink(n.Id)).ToList();
 
             var commonSink = new Node(counter);
-            commonSink.Properties["recipe"] = new ResourceTransformerInfo(
+            commonSink["recipe"] = new ResourceTransformerInfo(
                 "commonSink",
                 new[] { ("total", 1L) },
                 new[] { ("total", 1L) }
             );
-            commonSink.Properties["amount"] = 0.0;
+            commonSink["amount"] = 0.0;
             counter++;
             G.Nodes.Add(commonSink);
             foreach (var s in sinks)
             {
                 var edge = new Edge(s, commonSink);
-                edge.Properties["resource"] = "total";
+                edge["resource"] = "total";
                 G.Edges.Add(edge);
             }
 
             var connector = new Edge(commonSink.Id, recipeToId[what]);
-            connector.Properties["resource"] = "total";
+            connector["resource"] = "total";
             G.Edges.Add(connector);
 
             // after we looped back raw resources with root resource
@@ -122,6 +117,12 @@ public static class RecipePipelineBuilder
             G.SetSources(edges: G.Do.Induce(allowedNodes).Edges);
             G.Do.RemoveIsolatedNodes();
         }
+        //-----------------------
+        var whatNode = G.Nodes[recipeToId[what]];
+        var resG =  BuildRecipe(G,whatNode,amount);
+        resultGraph=G;
+        return resG;
+        //-----------------------
 
         var productionLines = new DefaultEdgeSource<Edge>();
         var productionUnits = new DefaultNodeSource<Node>(G.Nodes);
@@ -177,10 +178,10 @@ public static class RecipePipelineBuilder
                     // in one sec
                     var requiredAmount = 1.0*resourcesNeeded/produced;
 
-                    source.Properties["amount"] = requiredAmount + sourceAmount;
+                    source["amount"] = requiredAmount + sourceAmount;
 
                     // save amount of resource `res` moved by edge in one sec
-                    e.Properties["moved_amount"] = resourcesNeeded;
+                    e["moved_amount"] = resourcesNeeded;
                     // and save resulting graph edge
                     productionLines.Add(e);
                     G.Edges.Remove(e);
@@ -199,6 +200,136 @@ public static class RecipePipelineBuilder
         // here we do topological sort
         var clone = new Graph();
         clone.SetSources(productionUnits.AsEnumerable(),productionLines);
+        var layers = new List<Node[]>();
+        while(clone.Nodes.Count>0){
+            var sources = clone.Nodes.Where(n=>clone.Edges.IsSink(n.Id)).ToArray();
+            layers.Add(sources);
+            clone.Do.RemoveNodes(sources.Select(n=>n.Id).ToArray());
+        }
+
+       var result = layers
+            .Select(
+                x => 
+                x.Select(
+                    x => 
+                    (x.Get<IResourceTransformerInfo>("recipe"), x.Get<double>("amount")))
+                    .OrderBy(t=>t.Item2)
+                    .ToArray())
+            .Reverse()
+            .ToArray();
+
+        return result;
+    }
+    public static (IResourceTransformerInfo transformer, double amount)[][] BuildRecipe(Graph<Node,Edge> G,Node what, double amount,Func<Edge,double>? price = null)
+    {
+        IResourceTransformerInfo resinfo(Node n)=>n.Get<IResourceTransformerInfo>("recipe");
+
+        price ??= e=>1.0;
+        var solver = Solver.CreateSolver("SCIP");
+
+        foreach(var n in G.Nodes){
+            var r = resinfo(n);
+            n["amount"] = solver.MakeIntVar(0,long.MaxValue,r.ToString());
+        }
+        foreach(var e in G.Edges){
+            var res = e.Get<string>("resource");
+            e["moved_amount"] = solver.MakeIntVar(0,long.MaxValue,res);
+        }
+        var nodes = G.Nodes.ToArray();
+        
+        var amounts = nodes.Select(n=>n.Get<Variable>("amount")).ToArray();
+        var prices = nodes.Select(n=>(double)n.Get<IResourceTransformerInfo>("recipe").Price).ToArray();
+        
+        var totalPrice = amounts.Dot(prices);
+
+        //set conditions
+        foreach(var n in G.Nodes){
+            var r = resinfo(n);
+            var timeToProcess = r.Time;
+
+            var nAmount = n.Get<Variable>("amount");
+            var nAmountInSec = nAmount*1.0/timeToProcess;
+
+            var outE = G.Edges.OutEdges(n.Id);
+            var inE = G.Edges.InEdges(n.Id);
+
+            var outResources = 
+                inE
+                .Select(e=>new{
+                    Name=e.Get<string>("resource"),
+                    MovedAmount=e.Get<Variable>("moved_amount"),
+                    Price=price(e)
+                })
+                .GroupBy(e=>e.Name)
+                .ToDictionary(e=>e.First().Name,e=>e);
+            
+            var inResources = 
+                outE
+                .Select(e=>new{
+                    Name=e.Get<string>("resource"),
+                    MovedAmount=e.Get<Variable>("moved_amount"),
+                    Price=price(e)
+                })
+                .GroupBy(e=>e.Name)
+                .ToDictionary(e=>e.First().Name,e=>e);
+            
+            foreach(var requireResource in r.InputResources){
+                var requiredInSec = requireResource.amount*nAmountInSec;
+                if(!inResources.ContainsKey(requireResource.resourceName)) continue;
+
+                var inRes = inResources[requireResource.resourceName].ToList();
+                if(inRes.Count==0) continue;
+
+                var total = inRes[0].MovedAmount*1.0;
+                var totalMovementPrice = inRes[0].MovedAmount*inRes[0].Price;
+                foreach(var res in inRes.Skip(1)){
+                    total+=res.MovedAmount;
+                    totalMovementPrice+=res.MovedAmount*res.Price;
+                }
+
+                totalPrice+=totalMovementPrice;
+                solver.Add(total>=requiredInSec);
+            }
+
+            foreach(var producedResource in r.OutputResources){
+                var producedInSec = producedResource.amount*nAmountInSec;
+                if(!outResources.ContainsKey(producedResource.resourceName)) continue;
+
+                var outRes = outResources[producedResource.resourceName].ToList();
+                if(outRes.Count==0) continue;
+
+                var total = outRes[0].MovedAmount*1.0;
+                foreach(var res in outRes.Skip(1))
+                    total+=res.MovedAmount;
+                
+                solver.Add(total<=producedInSec);
+            }
+        }
+        var whatAmount = what.Get<Variable>("amount");
+        solver.Add(whatAmount>=amount);
+
+        solver.Minimize(totalPrice);
+
+        var solveRes = solver.Solve();
+        var objres = solver.Objective().Value();
+        var whatAmountRes = whatAmount.SolutionValue();
+        if(solveRes!=Solver.ResultStatus.OPTIMAL) 
+            throw new Exception("impossible to build pipeline");
+
+        foreach(var n in G.Nodes){
+            n["amount"]=n.Get<Variable>("amount").SolutionValue();
+        }
+        foreach(var e in G.Edges){
+            e["moved_amount"] = e.Get<Variable>("moved_amount").SolutionValue();
+        }
+
+        var resultGraph = new Graph();
+        resultGraph.SetSources(G.Nodes.Where(n=>n.Get<double>("amount")!=0),G.Edges.Where(e=>e.Get<double>("moved_amount")!=0));
+        resultGraph.Do.RemoveIsolatedNodes();
+        
+        // here we do topological sort
+        var clone = new Graph();
+        clone.SetSources(resultGraph.Nodes.AsEnumerable(),resultGraph.Edges);
         var layers = new List<Node[]>();
         while(clone.Nodes.Count>0){
             var sources = clone.Nodes.Where(n=>clone.Edges.IsSink(n.Id)).ToArray();

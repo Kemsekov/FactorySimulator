@@ -21,7 +21,7 @@ public class Main : IHostedService
     {
         var r = recipes;
         var recipe = r.Recipe[r.basicMachineHull];
-        // recipe = r.Recipe["bronze drill head"];
+        recipe = r.Recipe["bronze drill head"];
         recipe = new ResourceTransformerInfo(
             Transformer: "Result",
             InputResources: new[]{
@@ -33,8 +33,9 @@ public class Main : IHostedService
             OutputResources: new[]{
                 ("result",1L)
             });
-        var result = r.Recipe.Values.BuildRecipe(recipe, 1, out var G);
-
+        var result = r.Recipe.Values.BuildRecipe(recipe, 100, out var G);
+        var js = G.Nodes.Select(n=>n.Get<IResourceTransformerInfo>("recipe")).ToArray().ManyToJson();
+        File.WriteAllText("rep.json",js);
         foreach (var l in result)
         {
             System.Console.WriteLine("-----------------");
