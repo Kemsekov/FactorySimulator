@@ -1,3 +1,6 @@
+to run install `dotnet 8.0` and execute into console
+`dotnet run`
+
 In this example we need to create a `bronze drill`, that consists of several other details that are also created from other details and so on.
 
 Full recipes required can be seen into file `bronze_drill_recipes.json`.
