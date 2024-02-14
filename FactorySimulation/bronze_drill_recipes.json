@@ -38,8 +38,8 @@
                 16
             ]
         ],
-        "Time": 1,
-        "Cost": 1
+        "Time": 3,
+        "Cost": 7
     },
     {
         "Transformer": "Cutting machine",
@@ -84,8 +84,8 @@
                 4
             ]
         ],
-        "Time": 1,
-        "Cost": 0
+        "Time": 10,
+        "Cost": 5
     },
     {
         "Transformer": "Raw resource",
@@ -140,7 +140,7 @@
             ]
         ],
         "Time": 1,
-        "Cost": 1
+        "Cost": 2
     },
     {
         "Transformer": "Compressor",
@@ -232,8 +232,8 @@
                 1
             ]
         ],
-        "Time": 1,
-        "Cost": 1
+        "Time": 4,
+        "Cost": 6
     },
     {
         "Transformer": "Crafting table",
@@ -257,8 +257,8 @@
                 2
             ]
         ],
-        "Time": 1,
-        "Cost": 1
+        "Time": 2,
+        "Cost": 4
     },
     {
         "Transformer": "Cutting machine",
@@ -316,8 +316,8 @@
                 2
             ]
         ],
-        "Time": 1,
-        "Cost": 1
+        "Time": 3,
+        "Cost": 2
     },
     {
         "Transformer": "Cutting machine",
@@ -485,7 +485,7 @@
                 1
             ]
         ],
-        "Time": 1,
-        "Cost": 1
+        "Time": 10,
+        "Cost": 8
     }
 ]
