@@ -22,18 +22,18 @@ public class Main : IHostedService
     {
         var r = recipes;
         var recipe = r.Recipe[r.basicMachineHull];
-        recipe = r.Recipe["bronze drill head"];
-        recipe = new ResourceTransformerInfo(
-            Transformer: "Result",
-            InputResources: new[]{
-                (recipes.ElectricCompressor,1L),
-                (recipes.ElectricCuttingMachine,2L),
-                (recipes.ElectricMixer,1L),
-                (recipes.ElectricWiremill,3L),
-            },
-            OutputResources: new[]{
-                ("result",1L)
-            });
+        recipe = r.Recipe["bronze drill"];
+        // recipe = new ResourceTransformerInfo(
+        //     Transformer: "Result",
+        //     InputResources: new[]{
+        //         (recipes.ElectricCompressor,1L),
+        //         (recipes.ElectricCuttingMachine,2L),
+        //         (recipes.ElectricMixer,1L),
+        //         (recipes.ElectricWiremill,3L),
+        //     },
+        //     OutputResources: new[]{
+        //         ("result",1L)
+        //     });
         // var js = G.Nodes.Select(n => n.Recipe).ToArray().ManyToJson();
         // File.WriteAllText("rep.json", js);
 
@@ -83,8 +83,10 @@ public class Main : IHostedService
         var shapedrawer = new PlotShapeDrawer(size);
         var drawer = new GraphDrawer<RecipeNode,ResourceEdge>(G,shapedrawer,size,n=>n.MapProperties().Position);
         drawer.DrawEdges(G.Edges,0.0006,Color.Blue);
-        drawer.DrawNodes(G.Nodes,0.005,Color.Red);
-        drawer.DrawNodeIds(G.Nodes,Color.DarkBlue,0.005);
+        drawer.DrawNodes(G.Nodes,0.003,Color.Red);
+        foreach(var n in G.Nodes){
+            drawer.DrawNodeText(n,Color.DarkGreen,0.008,n.Recipe.OutputResources.First().resourceName);
+        }
         shapedrawer.plot.SaveFig("image.png");
     }
     /// <summary>

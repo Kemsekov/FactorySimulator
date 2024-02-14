@@ -16,7 +16,7 @@ public class ResourceTransformerInfoTests
                 ("D",2),
             },
             Time: 2,
-            Price: 4
+            Cost: 4
         );
 
         var json = res.ToJson();
@@ -25,7 +25,7 @@ public class ResourceTransformerInfoTests
         Assert.Equal(res.InputResources, converted.InputResources);
         Assert.Equal(res.OutputResources, converted.OutputResources);
         Assert.Equal(res.Time, converted.Time);
-        Assert.Equal(res.Price, converted.Price);
+        Assert.Equal(res.Cost, converted.Cost);
     }
     [Fact]
     public void JsonConvertMany()
@@ -41,7 +41,7 @@ public class ResourceTransformerInfoTests
                 ("D1",44),
             },
             Time: 12,
-            Price: 13
+            Cost: 13
         );
         var res2 = new ResourceTransformerInfo(
             "Machine2",
@@ -54,7 +54,7 @@ public class ResourceTransformerInfoTests
                 ("D2",22),
             },
             Time: 22,
-            Price: 42
+            Cost: 42
         );
         var res3 = new ResourceTransformerInfo(
             "Machine3",
@@ -67,7 +67,7 @@ public class ResourceTransformerInfoTests
                 ("D3",522),
             },
             Time: 122,
-            Price: 242
+            Cost: 242
         );
         var arr = new[] { res1, res2, res3 };
         var json = arr.ManyToJson();
@@ -79,7 +79,7 @@ public class ResourceTransformerInfoTests
             Assert.Equal(p1.InputResources, p2.InputResources);
             Assert.Equal(p1.OutputResources, p2.OutputResources);
             Assert.Equal(p1.Time, p2.Time);
-            Assert.Equal(p1.Price, p2.Price);
+            Assert.Equal(p1.Cost, p2.Cost);
         }
     }
 }

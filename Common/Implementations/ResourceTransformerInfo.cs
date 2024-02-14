@@ -11,7 +11,7 @@ public record ResourceTransformerInfo(string Transformer, (string resourceName, 
 {
     string serialize((string resourceName, long amount)[] data)
     {
-        return JsonSerializer.Serialize(data.Select(x => new string[] { x.resourceName, x.amount.ToString() }),ResourceTransformerInfoExtensions.jsonSerializerOptions())[1..^1];
+        return JsonSerializer.Serialize(data.Select(x => new string[] { x.resourceName, x.amount.ToString() }),ResourceTransformerInfoExtensions.jsonSerializerOptions())[1..^1].Replace("\"","");
         // return JsonSerializer.Serialize(data.Select(x=>new string[]{x.resourceName,x.amount.ToString()}))[1..^1];
     }
     ///<inheritdoc/>
@@ -19,7 +19,9 @@ public record ResourceTransformerInfo(string Transformer, (string resourceName, 
     {
         if (InputResources.Zip(OutputResources).All(x => x.First.resourceName == x.Second.resourceName && x.First.amount == x.Second.amount))
             return $"{Transformer}\n{serialize(InputResources)}";
-        return $"{Transformer}\n{serialize(InputResources)}\n{serialize(OutputResources)}\nTime: {Time}";
+        var timePart = Time!=1 ? $"\nTime: {Time}" : "";
+        var costPart = Cost!=1 ? $"\nCost: {Cost}" : "";
+        return $"{Transformer}\n{serialize(InputResources)}\n{serialize(OutputResources)}{timePart}{costPart}";
     }
     /// <summary>
     /// Converts this object to json
