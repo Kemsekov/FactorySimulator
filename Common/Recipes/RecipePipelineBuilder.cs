@@ -314,9 +314,11 @@ public static class RecipePipelineBuilder
         return result;
     }
     static void PlanarRender(IGraph<RecipeNode, ResourceEdge> resultGraph){
-        var fixedPoints = resultGraph.Nodes.Where(n=>resultGraph.Edges.Degree(n.Id)==1);
+        // var fixedPoints = resultGraph.Nodes.OrderBy(n=>resultGraph.Edges.Degree(n.Id)).Take(14);
         // var pos = resultGraph.Do.PlanarRender(fixedPoints.Select(i=>i.Id).ToArray());
-        var pos = resultGraph.Do.Arrange(200,getWeight:e=> 1).Positions;
+        var edges = resultGraph.Edges;
+        using var coefs = resultGraph.Do.FindLocalClusteringCoefficients();
+        var pos = resultGraph.Do.Arrange(200,getWeight:e => 1).Positions;
         var maxV = DenseVector.Create(2,float.MinValue);
         var minV = DenseVector.Create(2,float.MaxValue);
         foreach(var v in pos.Values){
