@@ -5,6 +5,11 @@ Logic can be seen into file `Main.cs`
 
 Results are following:
 
+Possible factory layout:
+![example](https://github.com/Kemsekov/FactorySimulator/assets/57869319/67597d38-ef12-4861-b81f-af939f3bffdd)
+In the image name under nodes is transformation output, number is number of machines(transformations) that need to be done at the same time.
+And node in the red circle is our objective.
+
 
 List of transformations that need to be done will be printed into console:
 
