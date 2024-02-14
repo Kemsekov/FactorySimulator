@@ -11,11 +11,15 @@ public partial class Recipes
 {
     public IDictionary<string, IResourceTransformerInfo> Recipe { get; } = new ConcurrentDictionary<string, IResourceTransformerInfo>();
     public IResourceTransformer[] transformers;
-    public Recipes(IEnumerable<IMetalPartRecipeFactory> metalPartRecipeFactories,IEnumerable<IDustable> dustFactories)
+    public Recipes(IEnumerable<IMetalPartRecipeFactory> metalPartRecipeFactories, IEnumerable<IDustable> dustFactories)
     {
-        var recipes = ResourceTransformerInfo.ManyFromJson(File.ReadAllText("recipes.json"));
-        foreach(var r in recipes){
-            Recipe[r.OutputResources.First().resourceName]=r;
+        if (File.Exists("Recipes/recipes.json"))
+        {
+            var recipes = ResourceTransformerInfo.ManyFromJson(File.ReadAllText("Recipes/recipes.json"));
+            foreach (var r in recipes)
+            {
+                Recipe[r.OutputResources.First().resourceName] = r;
+            }
         }
         //generate metal parts for following metals
         foreach (var m in Metals)
@@ -25,7 +29,8 @@ public partial class Recipes
             foreach (var factory in dustFactories)
                 factory.AddRecipe(m, this);
         }
-        foreach(var r in Rocks){
+        foreach (var r in Rocks)
+        {
             foreach (var factory in dustFactories)
                 factory.AddRecipe(r, this);
         }
@@ -135,17 +140,17 @@ public partial class Recipes
         //     new[] { (analogCircuitBoard, 1L) }
         // );
 
-         Recipe[analogCircuit] = new ResourceTransformerInfo(
-            CraftingTable,
-            new[]{
+        Recipe[analogCircuit] = new ResourceTransformerInfo(
+           CraftingTable,
+           new[]{
                 (resistor,2L),
                 ("copper wire",3L),
                 (analogCircuitBoard,1L),
                 (capacitor,2L),
                 (inductor,1L)
-            },
-            new[] { (analogCircuit, 1L) }
-        );
+           },
+           new[] { (analogCircuit, 1L) }
+       );
 
         Recipe[piston] = new ResourceTransformerInfo(
             CraftingTable,
@@ -258,7 +263,7 @@ public partial class Recipes
 
         Recipe[SolderingAlloy] = new ResourceTransformerInfo(
             RawResource,
-            new[]{ (SolderingAlloy,1L) },
+            new[] { (SolderingAlloy, 1L) },
             new[] { (SolderingAlloy, 1L) }
         );
 

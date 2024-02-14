@@ -62,9 +62,10 @@ public static class RecipePipelineBuilder
     /// <param name="recipes">A list of recipes</param>
     /// <param name="what">What we need to produce</param>
     /// <param name="amount">Amount of resource that we need to produce</param>
-    public static Graph<RecipeNode,ResourceEdge> ToRecipeGraph(this IEnumerable<IResourceTransformerInfo> recipes,IResourceTransformerInfo what, double amount = 1){
+    public static Graph<RecipeNode,ResourceEdge> ToRecipeGraph(this IEnumerable<IResourceTransformerInfo> recipes,IResourceTransformerInfo? what = null){
         var G = new Graph<RecipeNode,ResourceEdge>(i=>new(i),(a,b)=>new(a,b));
         IResourceTransformerInfo recipe(int nodeId) => G.Nodes[nodeId].Recipe;
+        if(what is not null)
         recipes = recipes.Append(what).Distinct().ToList();
         //enumerate recipes and assign indices
         var recipeToId = recipes.ToDictionary(x => x, x => -1);
@@ -80,8 +81,6 @@ public static class RecipePipelineBuilder
             G.Nodes.Add(n);
         }
 
-        //assign root resource amount
-        G.Nodes[recipeToId[what]].Amount = amount;
         //connect all recipes that is connectable by production line
         //every possible recipe chain is gonna be subgraph of G
         foreach (var n1 in G.Nodes)
@@ -108,6 +107,7 @@ public static class RecipePipelineBuilder
         // create common sink and loop back it to root node.
         // low-tier means some resource that does not have recipe
         // it is simplest raw material
+        if(what is not null)
         {
             var sinks = G.Nodes.Where(n => G.Edges.IsSink(n.Id)).ToList();
 
@@ -174,7 +174,7 @@ public static class RecipePipelineBuilder
     /// </returns>
     public static (IResourceTransformerInfo transformer, double amount)[][] BuildRecipe(this IEnumerable<IResourceTransformerInfo> recipes, IResourceTransformerInfo what, double amount,out Graph<RecipeNode,ResourceEdge> resultGraph)
     {
-        var G = recipes.ToRecipeGraph(what,amount);
+        var G = recipes.ToRecipeGraph(what);
         var whatNode = G.Nodes.First(n=>n.Recipe==what);
         var resG =  BuildRecipe(G,whatNode,amount);
         resultGraph=G;

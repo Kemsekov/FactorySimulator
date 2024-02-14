@@ -6,7 +6,7 @@ public class ToRecipeGraphTests
     public void ToRecipeGraph_Works(){
         var recipes = ResourceTransformerInfo.ManyFromJson(File.ReadAllText("rep.json"));
         var nameToRecipe = recipes.ToDictionary(r=>r.OutputResources.First().resourceName,r=>r);
-        var graph = recipes.ToRecipeGraph(nameToRecipe["result"],1);
+        var graph = recipes.ToRecipeGraph();
         var graphRecipes = graph.Nodes.Select(n=>n.Recipe).OrderBy(r=>r.GetHashCode());
         Assert.Equal(recipes.OrderBy(r=>r.GetHashCode()),graphRecipes);
 
