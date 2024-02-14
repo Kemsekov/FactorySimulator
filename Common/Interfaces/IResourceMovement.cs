@@ -15,9 +15,9 @@ public interface IResourceMovement
     /// </summary>
     long Amount{get;}
     /// <summary>
-    /// Price of resource movement
+    /// Cost of resource movement
     /// </summary>
-    long Price{get;}
+    long Cost{get;}
     /// <summary>
     /// Time to move resource from one resource storage to another in simulation ticks.
     /// </summary>

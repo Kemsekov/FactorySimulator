@@ -15,8 +15,8 @@ public record ResourceMovement : IResourceMovement
     /// <param name="transformers">Transformations groups</param>
     /// <param name="amount">How much each type of resources each resource movement can move at the time</param>
     /// <param name="time">How long each movement take</param>
-    /// <param name="price">Price of each movement</param>
-    public static IEnumerable<IResourceMovement> Pipe(IEnumerable<IEnumerable<IResourceTransformer>> transformers, long amount, long time = 1, long price = 0)
+    /// <param name="cost">Cost of each movement</param>
+    public static IEnumerable<IResourceMovement> Pipe(IEnumerable<IEnumerable<IResourceTransformer>> transformers, long amount, long time = 1, long cost = 0)
     {
         amount = Math.Abs(amount);
         var result = new List<IResourceMovement>();
@@ -34,7 +34,7 @@ public record ResourceMovement : IResourceMovement
                         To = t2.InputStorage,
                         Time = time,
                         Amount = amount,
-                        Price = price,
+                        Cost = cost,
                         ResourceName = resource
                     };
                     result.Add(movement);
@@ -55,8 +55,8 @@ public record ResourceMovement : IResourceMovement
     /// <param name="transformers">Transformations</param>
     /// <param name="amount">How much each type of resources each resource movement can move at the time</param>
     /// <param name="time">How long each movement take</param>
-    /// <param name="price">Price of each movement</param>
-    public static IEnumerable<IResourceMovement> PipeStraight(IEnumerable<IResourceTransformer> transformers, long amount, long time = 1, long price = 0)
+    /// <param name="cost">Cost of each movement</param>
+    public static IEnumerable<IResourceMovement> PipeStraight(IEnumerable<IResourceTransformer> transformers, long amount, long time = 1, long cost = 0)
     {
         amount = Math.Abs(amount);
         var result = new List<IResourceMovement>();
@@ -71,7 +71,7 @@ public record ResourceMovement : IResourceMovement
                     To = t2.InputStorage,
                     Time = time,
                     Amount = amount,
-                    Price = price,
+                    Cost = cost,
                     ResourceName = resource
                 };
                 result.Add(movement);
@@ -92,8 +92,8 @@ public record ResourceMovement : IResourceMovement
     /// <param name="transformers">Transformations</param>
     /// <param name="amount">How much each type of resources each resource movement can move at the time</param>
     /// <param name="time">How long each movement take</param>
-    /// <param name="price">Price of each movement</param>
-    public static IEnumerable<IResourceMovement> PipeEverything(IEnumerable<IResourceTransformer> transformers, long amount, long time = 1, long price = 0)
+    /// <param name="cost">Cost of each movement</param>
+    public static IEnumerable<IResourceMovement> PipeEverything(IEnumerable<IResourceTransformer> transformers, long amount, long time = 1, long cost = 0)
     {
         amount = Math.Abs(amount);
         var result = new List<IResourceMovement>();
@@ -110,7 +110,7 @@ public record ResourceMovement : IResourceMovement
                         To = t2.InputStorage,
                         Time = time,
                         Amount = amount,
-                        Price = price,
+                        Cost = cost,
                         ResourceName = resource
                     };
                     result.Add(movement);
@@ -126,7 +126,7 @@ public record ResourceMovement : IResourceMovement
     public long Amount { get; init; }
 
     ///<inheritdoc/>
-    public long Price { get; init; }
+    public long Cost { get; init; }
 
     ///<inheritdoc/>
     public long Time { get; init; }

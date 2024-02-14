@@ -7,7 +7,7 @@ using FactorySimulation.Interfaces;
 namespace FactorySimulation;
 
 ///<inheritdoc/>
-public record ResourceTransformerInfo(string Transformer, (string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Price = 1) : IResourceTransformerInfo
+public record ResourceTransformerInfo(string Transformer, (string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Cost = 1) : IResourceTransformerInfo
 {
     string serialize((string resourceName, long amount)[] data)
     {
@@ -39,9 +39,9 @@ public record ResourceTransformerInfo(string Transformer, (string resourceName, 
         var InputResources = values["InputResources"].EnumerateArray().Select(res => (res[0].GetString() ?? throw resourceNameMustBeString, res[1].GetInt64()));
         var OutputResources = values["OutputResources"].EnumerateArray().Select(res => (res[0].GetString() ?? throw resourceNameMustBeString, res[1].GetInt64()));
         var Time = values["Time"].GetInt64();
-        var Price = values["Price"].GetInt64();
+        var Cost = values["Cost"].GetInt64();
         var Transformer = values["Transformer"].GetString() ?? throw new ArgumentException("Missing Transformer variable");
-        return new ResourceTransformerInfo(Transformer, InputResources.ToArray(), OutputResources.ToArray(), Time, Price);
+        return new ResourceTransformerInfo(Transformer, InputResources.ToArray(), OutputResources.ToArray(), Time, Cost);
     }
     /// <summary>
     /// Converts many resources from single json string.<br/>

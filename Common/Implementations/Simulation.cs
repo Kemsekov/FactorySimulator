@@ -18,7 +18,7 @@ public class Simulation
     /// <summary>
     /// How much money did we spent so far for operating object
     /// </summary>
-    IDictionary<object, long> totalOperationPrice;
+    IDictionary<object, long> totalOperationCost;
     IResourceMovement[] movements;
     IResourceTransformer[] transformations;
     /// <summary>
@@ -34,18 +34,18 @@ public class Simulation
     {
         this.occupiedTicks = new Dictionary<object, long>();
         this.waitingTimeTicks = new Dictionary<object, long>();
-        this.totalOperationPrice = new Dictionary<object, long>();
+        this.totalOperationCost = new Dictionary<object, long>();
         foreach (var r in resourceMovements)
         {
             waitingTimeTicks[r] = 0;
             occupiedTicks[r] = 0;
-            totalOperationPrice[r] = 0;
+            totalOperationCost[r] = 0;
         }
         foreach (var t in resourceTransformations)
         {
             waitingTimeTicks[t] = 0;
             occupiedTicks[t] = 0;
-            totalOperationPrice[t] = 0;
+            totalOperationCost[t] = 0;
         }
         movements = resourceMovements.ToArray();
         transformations = resourceTransformations.ToArray();
@@ -75,7 +75,7 @@ public class Simulation
                 movement.From.Take(movement.ResourceName, canMove, out var res);
                 movement.To.Put(res ?? Resource.Empty(movement.ResourceName));
                 occupiedTicks[movement] = Math.Abs(movement.Time);
-                totalOperationPrice[movement] += movement.Price;
+                totalOperationCost[movement] += movement.Cost;
             }
             else
                 waitingTimeTicks[movement] += 1;
@@ -92,7 +92,7 @@ public class Simulation
             if (transformation.Transform())
             {
                 occupiedTicks[transformation] = Math.Abs(transformation.Info.Time);
-                totalOperationPrice[transformation] += transformation.Info.Price;
+                totalOperationCost[transformation] += transformation.Info.Cost;
             }
             else
                 waitingTimeTicks[transformation] += 1;
@@ -136,16 +136,16 @@ public class Simulation
     /// <summary>
     /// How much money given movement operation consumed so far
     /// </summary>
-    public long TotalPrice(IResourceMovement m)
+    public long TotalCost(IResourceMovement m)
     {
-        return GetValueOrZero(totalOperationPrice, m);
+        return GetValueOrZero(totalOperationCost, m);
     }
     /// <summary>
     /// How much money given transformer operation consumed so far
     /// </summary>
-    public long TotalPrice(IResourceTransformer t)
+    public long TotalCost(IResourceTransformer t)
     {
-        return GetValueOrZero(totalOperationPrice, t);
+        return GetValueOrZero(totalOperationCost, t);
     }
     /// <summary>
     /// Get view on total amount of resources in simulation

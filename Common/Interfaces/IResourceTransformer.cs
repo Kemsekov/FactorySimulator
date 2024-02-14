@@ -19,7 +19,7 @@ public interface IResourceTransformerInfo
     /// <summary>
     /// What it costs to do one transformation.
     /// </summary>
-    long Price { get; }
+    long Cost { get; }
     /// <summary>
     /// Name of transformation. Where this transformation happening? Maybe machine name that assembles some detail.
     /// </summary>

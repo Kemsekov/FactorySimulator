@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="GradientDescentSharp" Version="0.0.9" />
     <PackageReference Include="Kemsekov.GraphSharp.GoogleOrTools" Version="3.1.2" />
   </ItemGroup>
 </Project>

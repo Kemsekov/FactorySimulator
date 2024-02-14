@@ -13,7 +13,7 @@ public static class ResourceTransformerInfoExtensions
         dictValues["InputResources"]=t.InputResources.Select(i=>new object[]{i.resourceName,i.amount});
         dictValues["OutputResources"]=t.OutputResources.Select(i=>new object[]{i.resourceName,i.amount});
         dictValues["Time"]=t.Time;
-        dictValues["Price"]=t.Price;
+        dictValues["Cost"]=t.Cost;
 
         return JsonSerializer.Serialize(dictValues,jsonSerializerOptions());
     }
