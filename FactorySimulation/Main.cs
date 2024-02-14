@@ -18,16 +18,31 @@ public class Main : IHostedService
         var nameToRecipe = r.ToDictionary(r => r.OutputResources.First().resourceName, r => r);
         var recipe = nameToRecipe["bronze drill"];
 
-        var result = r.BuildRecipe(recipe, 100, out var G);
-        
-        var totalCost = G.Nodes.Sum(n=>n.Amount*n.Recipe.Cost)+G.Edges.Sum(e=>e.Flow*e.Cost);
-        PipelineSummary(result);
+        var G = r.ToRecipeGraph(recipe);
+        var recipeNode = G.Nodes.First(n=>n.Recipe==recipe);
+        //here assign limitations to nodes and edges
+        foreach(var n in G.Nodes){
+            if(n.Recipe.Transformer.Contains("Raw"))
+                n.MaxAmount=double.MaxValue;
+            else
+                n.MaxAmount=5;
+        }
+
+        var result = RecipePipelineBuilder.BuildRecipe(
+            G,
+            // (s,cost)=>RecipePipelineBuilder.MaximizeAmountWithLimitedCost(recipeNode,100,s,cost),
+            (s,cost)=>RecipePipelineBuilder.ProduceEnoughObjective(recipeNode,1,s,cost),
+            RecipePipelineBuilder.IntVar,
+            RecipePipelineBuilder.DoubleVar
+        );
+
+        PipelineSummary(result.Transformations);
         System.Console.WriteLine("-----------------");
-        MachinesSummary(result);
+        MachinesSummary(result.Transformations);
         System.Console.WriteLine("-----------------");
         System.Console.WriteLine("Recipies used: " + G.Nodes.Count);
         System.Console.WriteLine("Resource movements: " + G.Edges.Count);
-        System.Console.WriteLine("Total cost: " + totalCost);
+        System.Console.WriteLine("Total cost: " + result.TotalCost);
 
         Render(G, recipe);
         return Task.CompletedTask;
@@ -55,7 +70,7 @@ public class Main : IHostedService
                     .GroupBy(t => t.transformer.Transformer)
                     .Select(c => new { c.First().transformer.Transformer, Amount = c.Count() })
                     .OrderBy(t => t.Amount);
-        System.Console.WriteLine("Summary of machines needed:\n");
+        System.Console.WriteLine("Summary of different recipes machines needed:\n");
         foreach (var m in machinesNeeded)
         {
             System.Console.WriteLine(m.Transformer + " " + m.Amount);

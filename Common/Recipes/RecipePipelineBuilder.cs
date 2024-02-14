@@ -11,49 +11,6 @@ using MathNet.Numerics.LinearAlgebra.Single;
 using System.Linq;
 using System.Reflection;
 namespace FactorySimulation;
-
-public class ResourceEdge : Edge
-{
-    public ResourceEdge(INode source, INode target) : base(source, target)
-    {
-    }
-    public ResourceEdge(int source, int target) : base(source, target)
-    {
-    }
-    /// <summary>
-    /// Cost of moving 1 unit of resource trough this edge
-    /// </summary>
-    public double Cost{get;set;}=1;
-    /// <summary>
-    /// Max amount of resources that can be moved in one second
-    /// </summary>
-    public double Capacity{get;set;}=int.MaxValue;
-    /// <summary>
-    /// Resource name that is moving by this edge
-    /// </summary>
-    public string Resource{get;set;}
-    /// <summary>
-    /// How much resource is moving trough edge in one sec
-    /// </summary>
-    public double Flow{get;set;}
-}
-
-public class RecipeNode : Node
-{
-    public RecipeNode(int id) : base(id)
-    {
-    }
-    public IResourceTransformerInfo Recipe{get;set;}
-    /// <summary>
-    /// Amount of transformers that implements recipe.
-    /// </summary>
-    public double Amount{get;set;}
-    /// <summary>
-    /// Max possible amount of this machine
-    /// </summary>
-    public double MaxAmount{get;set;} = int.MaxValue;
-}
-
 public static class RecipePipelineBuilder
 {
     /// <summary>
@@ -62,19 +19,21 @@ public static class RecipePipelineBuilder
     /// <param name="recipes">A list of recipes</param>
     /// <param name="what">What we need to produce</param>
     /// <param name="amount">Amount of resource that we need to produce</param>
-    public static Graph<RecipeNode,ResourceEdge> ToRecipeGraph(this IEnumerable<IResourceTransformerInfo> recipes,IResourceTransformerInfo? what = null){
-        var G = new Graph<RecipeNode,ResourceEdge>(i=>new(i),(a,b)=>new(a,b));
+    public static Graph<RecipeNode, ResourceEdge> ToRecipeGraph(this IEnumerable<IResourceTransformerInfo> recipes, IResourceTransformerInfo? what = null)
+    {
+        var G = new Graph<RecipeNode, ResourceEdge>(i => new(i), (a, b) => new(a, b));
         IResourceTransformerInfo recipe(int nodeId) => G.Nodes[nodeId].Recipe;
-        if(what is not null)
-        recipes = recipes.Append(what).Distinct().ToList();
+        if (what is not null)
+            recipes = recipes.Append(what).Distinct().ToList();
         //enumerate recipes and assign indices
         var recipeToId = recipes.ToDictionary(x => x, x => -1);
         int counter = 0;
         foreach (var r in recipes)
         {
-            var n = new RecipeNode(counter){
-                Recipe=r,
-                Amount=0
+            var n = new RecipeNode(counter)
+            {
+                Recipe = r,
+                Amount = 0
             };
             recipeToId[r] = counter;
             counter++;
@@ -97,8 +56,9 @@ public static class RecipePipelineBuilder
                     .ToArray();
                 foreach (var resource in canBeMoved)
                 {
-                    var edge = new ResourceEdge(n2, n1){
-                        Resource=resource
+                    var edge = new ResourceEdge(n2, n1)
+                    {
+                        Resource = resource
                     };
                     G.Edges.Add(edge);
                 }
@@ -107,7 +67,7 @@ public static class RecipePipelineBuilder
         // create common sink and loop back it to root node.
         // low-tier means some resource that does not have recipe
         // it is simplest raw material
-        if(what is not null)
+        if (what is not null)
         {
             var sinks = G.Nodes.Where(n => G.Edges.IsSink(n.Id)).ToList();
 
@@ -122,14 +82,16 @@ public static class RecipePipelineBuilder
             G.Nodes.Add(commonSink);
             foreach (var s in sinks)
             {
-                var edge = new ResourceEdge(s, commonSink){
-                    Resource="total"
+                var edge = new ResourceEdge(s, commonSink)
+                {
+                    Resource = "total"
                 };
                 G.Edges.Add(edge);
             }
 
-            var connector = new ResourceEdge(commonSink.Id, recipeToId[what]){
-                Resource="total"
+            var connector = new ResourceEdge(commonSink.Id, recipeToId[what])
+            {
+                Resource = "total"
             };
             G.Edges.Add(connector);
 
@@ -139,9 +101,9 @@ public static class RecipePipelineBuilder
             var components = G.Do.FindStronglyConnectedComponentsTarjan();
 
             // among many components find one that contains our root resource
-            var allowedNodes = 
+            var allowedNodes =
                 components.Components
-                .First(c => 
+                .First(c =>
                     c.nodes
                     .Any(x => x.Id == recipeToId[what]))
                 .nodes
@@ -156,46 +118,64 @@ public static class RecipePipelineBuilder
         return G;
     }
     /// <summary>
-    /// Builds required recipe information of how to reproduce it, 
+    /// Builds required recipe information of how to reproduce it
     /// </summary>
-    /// <param name="resultGraph">
-    /// Resulting resources movement graph.<br/>
-    /// Each node represents recipe. <br/>
-    /// Each node have properties <br/> 
-    /// "recipe" of type <see cref="IResourceTransformerInfo"/> which contain recipe <br/>
-    /// "amount" of <see cref="long"/> which contains amount of this recipe reproducers needed <br/>
-    /// Each edge have properties <br/>
-    /// "resource" of type <see cref="string"/> which contains resource name that is moved trough this edge <br/>
-    /// "flow" of type <see cref="string"/> which contains amount of moved resource from one node to another
-    /// </param>
     /// <param name="what">What to reproduce</param>
+    /// <param name="amount">How much to reproduce</param>
     /// <returns>
-    /// Topologically sorted chain of transformations
+    /// Pipeline result
     /// </returns>
-    public static (IResourceTransformerInfo transformer, double amount)[][] BuildRecipe(this IEnumerable<IResourceTransformerInfo> recipes, IResourceTransformerInfo what, double amount,out Graph<RecipeNode,ResourceEdge> resultGraph)
+    public static PipelineResult BuildRecipe(this IEnumerable<IResourceTransformerInfo> recipes, IResourceTransformerInfo what, double amount)
     {
         var G = recipes.ToRecipeGraph(what);
-        var whatNode = G.Nodes.First(n=>n.Recipe==what);
-        var resG =  BuildRecipe(G,whatNode,amount);
-        resultGraph=G;
-        return resG;
+        var whatNode = G.Nodes.First(n => n.Recipe == what);
+        var result = BuildRecipe(
+            G, 
+            (s,totalCost)=>ProduceEnoughObjective(whatNode,amount,s,totalCost),
+            IntVar,
+            DoubleVar);
+        return result;
     }
-    public static (IResourceTransformerInfo transformer, double amount)[][] BuildRecipe(Graph<RecipeNode,ResourceEdge> G,Node what, double amount)
+    /// <summary>
+    /// Builds required recipe information of how to reproduce it
+    /// </summary>
+    /// <param name="G">Resource flow graph</param>
+    /// <param name="what">What to reproduce</param>
+    /// <param name="amount">How much to reproduce</param>
+    /// <param name="ObjectiveF">
+    /// Objective function that takes solver as first param and total cost as second param<br/>
+    /// It is good to use one of <br/>
+    /// <see cref="ProduceEnoughObjective"/>  <br/>
+    /// <see cref="MaximizeAmountWithLimitedCost"/>
+    /// </param>
+    /// <param name="amountType">
+    /// Solver node amount variable type.<br/>
+    /// It is good to use one of <br/>
+    /// <see cref="IntVar"/>  <br/>
+    /// <see cref="DoubleVar"/>
+    /// </param>
+    /// <param name="flowType">
+    /// Solver edge flow variable type.<br/>
+    /// It is good to use one of <br/> 
+    /// <see cref="IntVar"/> <br/> 
+    /// <see cref="DoubleVar"/>
+    /// </param>
+    /// <returns>
+    /// Pipeline result
+    /// </returns>
+    public static PipelineResult BuildRecipe(Graph<RecipeNode, ResourceEdge> G, Action<Solver,Google.OrTools.LinearSolver.LinearExpr> ObjectiveF, Func<Solver, Variable>? amountType = null,Func<Solver, Variable>? flowType = null)
     {
-        IResourceTransformerInfo resinfo(RecipeNode n) => n.Recipe;
+        amountType ??= s => s.MakeIntVar(0, long.MaxValue, "");
+        flowType ??= s => s.MakeIntVar(0, long.MaxValue, "");
 
         var solver = Solver.CreateSolver("SCIP");
 
         foreach (var n in G.Nodes)
-        {
-            var r = resinfo(n);
-            n["amount"] = solver.MakeIntVar(0, long.MaxValue, r.ToString());
-        }
+            n["amount"] = amountType(solver);
+
         foreach (var e in G.Edges)
-        {
-            var res = e.Resource;
-            e["flow"] = solver.MakeIntVar(0, long.MaxValue, res);
-        }
+            e["flow"] = flowType(solver);
+
         var nodes = G.Nodes.ToArray();
 
         var amounts = nodes.Select(n => n.Get<Variable>("amount")).ToArray();
@@ -206,7 +186,7 @@ public static class RecipePipelineBuilder
         //set conditions
         foreach (var n in G.Nodes)
         {
-            var r = resinfo(n);
+            var r = n.Recipe;
             var timeToProcess = r.Time;
 
             var nAmount = n.Get<Variable>("amount");
@@ -279,15 +259,14 @@ public static class RecipePipelineBuilder
             solver.Add(flow <= e.Capacity);
         }
 
-        foreach (var n in G.Nodes){
+        foreach (var n in G.Nodes)
+        {
             var namount = n.Get<Variable>("amount");
-            solver.Add(namount<=n.MaxAmount);
+            solver.Add(namount <= n.MaxAmount);
         }
 
         //impose objective goal
-        var whatAmount = what.Get<Variable>("amount");
-        solver.Add(whatAmount >= amount);
-        solver.Minimize(totalCost);
+        ObjectiveF(solver, totalCost);
 
         var solveRes = solver.Solve();
         if (solveRes != Solver.ResultStatus.OPTIMAL)
@@ -311,27 +290,69 @@ public static class RecipePipelineBuilder
         // here we do topological sort
         var result = TopologicalSort(G, resultGraph);
 
-        return result;
+        return new()
+        {
+            Graph = G,
+            TotalCost = G.Nodes.Sum(n => n.Amount * n.Recipe.Cost) + G.Edges.Sum(e => e.Flow * e.Cost),
+            Transformations = result
+        };
     }
-    static void PlanarRender(IGraph<RecipeNode, ResourceEdge> resultGraph){
+    
+    /// <summary>
+    /// Integer variable
+    /// </summary>
+    public static Variable IntVar(Solver s){
+        return s.MakeIntVar(0,long.MaxValue,"");
+    }
+    /// <summary>
+    /// Double variable
+    /// </summary>
+    public static Variable DoubleVar(Solver s){
+        return s.MakeNumVar(0,double.MaxValue,"");
+    }
+
+    /// <summary>
+    /// This is objective that forces to produce enough amount of required recipe.
+    /// </summary>
+    public static void ProduceEnoughObjective(Node what, double amount, Solver solver, Google.OrTools.LinearSolver.LinearExpr totalCost)
+    {
+        var whatAmount = what.Get<Variable>("amount");
+        solver.Add(whatAmount >= amount);
+        solver.Minimize(totalCost);
+    }
+    /// <summary>
+    /// This is objective that maximizes amount of `what` node recipe production meanwhile limiting the cost
+    /// </summary>
+    public static void MaximizeAmountWithLimitedCost(Node what,double maxCost, Solver solver, Google.OrTools.LinearSolver.LinearExpr totalCost)
+    {
+        var whatAmount = what.Get<Variable>("amount");
+        solver.Add(totalCost<=maxCost);
+        solver.Maximize(whatAmount);
+    }
+    
+    static void PlanarRender(IGraph<RecipeNode, ResourceEdge> resultGraph)
+    {
         // var fixedPoints = resultGraph.Nodes.OrderBy(n=>resultGraph.Edges.Degree(n.Id)).Take(14);
         // var pos = resultGraph.Do.PlanarRender(fixedPoints.Select(i=>i.Id).ToArray());
         var edges = resultGraph.Edges;
         using var coefs = resultGraph.Do.FindLocalClusteringCoefficients();
-        var pos = resultGraph.Do.Arrange(200,getWeight:e => 1).Positions;
-        var maxV = DenseVector.Create(2,float.MinValue);
-        var minV = DenseVector.Create(2,float.MaxValue);
-        foreach(var v in pos.Values){
-            maxV= (DenseVector)maxV.PointwiseMaximum(v);
-            minV= (DenseVector)minV.PointwiseMinimum(v);
+        var pos = resultGraph.Do.Arrange(200, getWeight: e => 1).Positions;
+        var maxV = DenseVector.Create(2, float.MinValue);
+        var minV = DenseVector.Create(2, float.MaxValue);
+        foreach (var v in pos.Values)
+        {
+            maxV = (DenseVector)maxV.PointwiseMaximum(v);
+            minV = (DenseVector)minV.PointwiseMinimum(v);
         }
-        var scale = maxV-minV;
-        foreach(var v in pos.Values){
-            v.MapIndexedInplace((i,vec)=>(vec-minV[i])/scale[i]);
+        var scale = maxV - minV;
+        foreach (var v in pos.Values)
+        {
+            v.MapIndexedInplace((i, vec) => (vec - minV[i]) / scale[i]);
         }
 
-        foreach(var n in resultGraph.Nodes){
-            n.MapProperties().Position= (Vector)pos[n.Id];
+        foreach (var n in resultGraph.Nodes)
+        {
+            n.MapProperties().Position = (Vector)pos[n.Id];
         }
     }
     static (IResourceTransformerInfo Recipe, double Amount)[][] TopologicalSort(Graph<RecipeNode, ResourceEdge> G, IGraph<RecipeNode, ResourceEdge> resultGraph)
