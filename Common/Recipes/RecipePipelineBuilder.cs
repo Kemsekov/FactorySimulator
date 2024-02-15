@@ -343,11 +343,10 @@ public static class RecipePipelineBuilder
     static void PlanarRender(IGraph<RecipeNode, ResourceEdge> resultGraph)
     {
         // var edges = resultGraph.Edges;
-        var pos = resultGraph.Do.Arrange(200, getWeight: e => 1);
-        
-        foreach (var n in resultGraph.Nodes)
-        {
-            n.MapProperties().Position = pos[n.Id];
+        var edges = resultGraph.Edges;
+        var pos = resultGraph.Do.Arrange(200,getWeight:e => 1);
+        foreach(var n in resultGraph.Nodes){
+            n.MapProperties().Position= (Vector)pos[n.Id];
         }
     }
     static (IResourceTransformerInfo Recipe, double Amount)[][] TopologicalSort(Graph<RecipeNode, ResourceEdge> G, IGraph<RecipeNode, ResourceEdge> resultGraph)
