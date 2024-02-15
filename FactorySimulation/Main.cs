@@ -8,26 +8,28 @@ using ScottPlot;
 namespace FactorySimulation;
 public class Main : IHostedService
 {
+    public Recipes Recipes { get; }
 
-    public Main()
+    public Main(Recipes recipes)
     {
+        Recipes = recipes;
     }
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        var r = ResourceTransformerInfo.ManyFromJson(File.ReadAllText("bronze_drill_recipes.json"));
+        // var r = ResourceTransformerInfo.ManyFromJson(File.ReadAllText("bronze_drill_recipes.json"));
+        var r = Recipes.Recipe.Values;
         var nameToRecipe = r.ToDictionary(r => r.OutputResources.First().resourceName, r => r);
-        var recipe = nameToRecipe["bronze drill"];
-
+        IResourceTransformerInfo recipe = new ResourceTransformerInfo(
+            "result",
+            [
+                ("electric compressor",1),
+                ("electric wiremill",1)
+            ],
+            [("result",1)]
+        );
         var G = r.ToRecipeGraph(recipe);
         var recipeNode = G.Nodes.First(n=>n.Recipe==recipe);
-        //here assign limitations to nodes and edges
-        foreach(var n in G.Nodes){
-            if(n.Recipe.Transformer.Contains("Raw"))
-                n.MaxAmount=double.MaxValue;
-            else
-                n.MaxAmount=5;
-        }
-
+        
         var result = RecipePipelineBuilder.BuildRecipe(
             G,
             // (s,cost)=>RecipePipelineBuilder.MaximizeAmountWithLimitedCost(recipeNode,100,s,cost),

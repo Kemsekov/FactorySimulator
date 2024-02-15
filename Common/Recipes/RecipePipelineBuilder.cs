@@ -130,8 +130,8 @@ public static class RecipePipelineBuilder
         var G = recipes.ToRecipeGraph(what);
         var whatNode = G.Nodes.First(n => n.Recipe == what);
         var result = BuildRecipe(
-            G, 
-            (s,totalCost)=>ProduceEnoughObjective(whatNode,amount,s,totalCost),
+            G,
+            (s, totalCost) => ProduceEnoughObjective(whatNode, amount, s, totalCost),
             IntVar,
             DoubleVar);
         return result;
@@ -163,7 +163,7 @@ public static class RecipePipelineBuilder
     /// <returns>
     /// Pipeline result
     /// </returns>
-    public static PipelineResult BuildRecipe(Graph<RecipeNode, ResourceEdge> G, Action<Solver,Google.OrTools.LinearSolver.LinearExpr> ObjectiveF, Func<Solver, Variable>? amountType = null,Func<Solver, Variable>? flowType = null)
+    public static PipelineResult BuildRecipe(Graph<RecipeNode, ResourceEdge> G, Action<Solver, Google.OrTools.LinearSolver.LinearExpr> ObjectiveF, Func<Solver, Variable>? amountType = null, Func<Solver, Variable>? flowType = null)
     {
         amountType ??= s => s.MakeIntVar(0, long.MaxValue, "");
         flowType ??= s => s.MakeIntVar(0, long.MaxValue, "");
@@ -297,18 +297,20 @@ public static class RecipePipelineBuilder
             Transformations = result
         };
     }
-    
+
     /// <summary>
     /// Integer variable
     /// </summary>
-    public static Variable IntVar(Solver s){
-        return s.MakeIntVar(0,long.MaxValue,"");
+    public static Variable IntVar(Solver s)
+    {
+        return s.MakeIntVar(0, long.MaxValue, "");
     }
     /// <summary>
     /// Double variable
     /// </summary>
-    public static Variable DoubleVar(Solver s){
-        return s.MakeNumVar(0,double.MaxValue,"");
+    public static Variable DoubleVar(Solver s)
+    {
+        return s.MakeNumVar(0, double.MaxValue, "");
     }
 
     /// <summary>
@@ -323,36 +325,29 @@ public static class RecipePipelineBuilder
     /// <summary>
     /// This is objective that maximizes amount of `what` node recipe production meanwhile limiting the cost
     /// </summary>
-    public static void MaximizeAmountWithLimitedCost(Node what,double maxCost, Solver solver, Google.OrTools.LinearSolver.LinearExpr totalCost)
+    public static void MaximizeAmountWithLimitedCost(Node what, double maxCost, Solver solver, Google.OrTools.LinearSolver.LinearExpr totalCost)
     {
         var whatAmount = what.Get<Variable>("amount");
-        solver.Add(totalCost<=maxCost);
+        solver.Add(totalCost <= maxCost);
         solver.Maximize(whatAmount);
     }
-    
+    /// <summary>
+    /// </summary>
+    static Google.OrTools.Sat.LinearExpr Sum(this IEnumerable<Google.OrTools.Sat.LinearExpr> exp)
+    {
+        var sum = exp.First() * 1;
+        foreach (var e in exp.Skip(1))
+            sum += e;
+        return sum;
+    }
     static void PlanarRender(IGraph<RecipeNode, ResourceEdge> resultGraph)
     {
-        // var fixedPoints = resultGraph.Nodes.OrderBy(n=>resultGraph.Edges.Degree(n.Id)).Take(14);
-        // var pos = resultGraph.Do.PlanarRender(fixedPoints.Select(i=>i.Id).ToArray());
-        var edges = resultGraph.Edges;
-        using var coefs = resultGraph.Do.FindLocalClusteringCoefficients();
-        var pos = resultGraph.Do.Arrange(200, getWeight: e => 1).Positions;
-        var maxV = DenseVector.Create(2, float.MinValue);
-        var minV = DenseVector.Create(2, float.MaxValue);
-        foreach (var v in pos.Values)
-        {
-            maxV = (DenseVector)maxV.PointwiseMaximum(v);
-            minV = (DenseVector)minV.PointwiseMinimum(v);
-        }
-        var scale = maxV - minV;
-        foreach (var v in pos.Values)
-        {
-            v.MapIndexedInplace((i, vec) => (vec - minV[i]) / scale[i]);
-        }
-
+        // var edges = resultGraph.Edges;
+        var pos = resultGraph.Do.Arrange(200, getWeight: e => 1);
+        
         foreach (var n in resultGraph.Nodes)
         {
-            n.MapProperties().Position = (Vector)pos[n.Id];
+            n.MapProperties().Position = pos[n.Id];
         }
     }
     static (IResourceTransformerInfo Recipe, double Amount)[][] TopologicalSort(Graph<RecipeNode, ResourceEdge> G, IGraph<RecipeNode, ResourceEdge> resultGraph)
