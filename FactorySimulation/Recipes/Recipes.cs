@@ -16,7 +16,7 @@ public partial class Recipes
         if (File.Exists("Recipes/recipes.json"))
         {
             var recipes = ResourceTransformerInfo.ManyFromJson(File.ReadAllText("Recipes/recipes.json"));
-            foreach (var r in recipes)
+            foreach (var r in recipes.Transformations)
             {
                 Recipe[r.OutputResources.First().resourceName] = r;
             }

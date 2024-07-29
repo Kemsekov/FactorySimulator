@@ -7,7 +7,7 @@ using FactorySimulation.Interfaces;
 namespace FactorySimulation;
 
 ///<inheritdoc/>
-public record ResourceTransformerInfo(string Transformer, (string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Cost = 1) : IResourceTransformerInfo
+public record ResourceTransformerInfo(string Transformer, (string resourceName, long amount)[] InputResources, (string resourceName, long amount)[] OutputResources, long Time = 1, long Cost = 1,double MaxAmount = double.MaxValue) : IResourceTransformerInfo
 {
     string serialize((string resourceName, long amount)[] data)
     {
@@ -21,20 +21,13 @@ public record ResourceTransformerInfo(string Transformer, (string resourceName, 
             return $"{Transformer}\n{serialize(InputResources)}";
         var timePart = Time!=1 ? $"\nTime: {Time}" : "";
         var costPart = Cost!=1 ? $"\nCost: {Cost}" : "";
-        return $"{Transformer}\n{serialize(InputResources)}\n{serialize(OutputResources)}{timePart}{costPart}";
+        var maxAmountPart = MaxAmount!=double.MaxValue ? $"\nMaxAmount: {MaxAmount}" : "";
+        return $"{Transformer}\n{serialize(InputResources)}\n{serialize(OutputResources)}{timePart}{costPart}{maxAmountPart}";
     }
     /// <summary>
     /// Converts this object to json
     /// </summary>
     public string ToJson() => ResourceTransformerInfoExtensions.ToJson(this);
-    /// <summary>
-    /// Creates resource transformer from json
-    /// </summary>
-    public static IResourceTransformerInfo FromJson(string json)
-    {
-        var values = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json,ResourceTransformerInfoExtensions.jsonSerializerOptions()) ?? throw new ArgumentException("Cannot deserialize json");
-        return fromJsonDict(values);
-    }
     static IResourceTransformerInfo fromJsonDict(Dictionary<string, JsonElement> values)
     {
         var resourceNameMustBeString = new ArgumentException("Resource name must be string");
@@ -43,17 +36,29 @@ public record ResourceTransformerInfo(string Transformer, (string resourceName, 
         var Time = values["Time"].GetInt64();
         var Cost = values["Cost"].GetInt64();
         var Transformer = values["Transformer"].GetString() ?? throw new ArgumentException("Missing Transformer variable");
-        return new ResourceTransformerInfo(Transformer, InputResources.ToArray(), OutputResources.ToArray(), Time, Cost);
+        var maxAmount = double.MaxValue;
+        if(values.ContainsKey("MaxAmount")){
+            maxAmount = values["MaxAmount"].GetDouble();
+            if(maxAmount<0)
+                maxAmount = double.MaxValue;
+        }
+        return new ResourceTransformerInfo(Transformer, InputResources.ToArray(), OutputResources.ToArray(), Time, Cost,maxAmount);
     }
+    record Input(Dictionary<string, JsonElement>[] Transformations, TransformerLimitation[] TransformersLimitations);
+    public record TransformerLimitation(string Transformer, double MaxAmount);
+    public record TransformationsConstraints(IResourceTransformerInfo[] Transformations, TransformerLimitation[] TransformerLimitations);
     /// <summary>
     /// Converts many resources from single json string.<br/>
     /// </summary>
     /// <param name="json">Contains single array objects that can be converted by <see cref="ResourceTransformerInfo.FromJson(string)"/> </param>
     /// <returns></returns>
-    public static IResourceTransformerInfo[] ManyFromJson(string json)
+    public static TransformationsConstraints ManyFromJson(string json)
     {
-        var values = JsonSerializer.Deserialize<Dictionary<string, JsonElement>[]>(json,ResourceTransformerInfoExtensions.jsonSerializerOptions()) ?? throw new ArgumentException("Cannot deserialize json");
-        return values.Select(fromJsonDict).ToArray();
+        var values = JsonSerializer.Deserialize<Input>(json,ResourceTransformerInfoExtensions.jsonSerializerOptions()) ?? throw new ArgumentException("Cannot deserialize json");
+        var parsedTransformations = values.Transformations.Select(fromJsonDict).ToArray();
+        var res = new TransformationsConstraints
+            (parsedTransformations,values.TransformersLimitations);
+        return res;
     }
 };
 

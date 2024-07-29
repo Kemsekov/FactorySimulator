@@ -14,7 +14,7 @@ public static class ResourceTransformerInfoExtensions
         dictValues["OutputResources"]=t.OutputResources.Select(i=>new object[]{i.resourceName,i.amount});
         dictValues["Time"]=t.Time;
         dictValues["Cost"]=t.Cost;
-
+        dictValues["MaxAmount"]=t.MaxAmount;
         return JsonSerializer.Serialize(dictValues,jsonSerializerOptions());
     }
     /// <summary>
