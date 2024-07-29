@@ -36,4 +36,8 @@ public class ResourceEdge : Edge
     /// How much resource is moving trough edge in one sec
     /// </summary>
     public double Flow{get;set;}
+    /// <summary>
+    /// Flow variable that is used by solver
+    /// </summary> <summary>
+    public Variable FlowVariable{get;set;}
 }

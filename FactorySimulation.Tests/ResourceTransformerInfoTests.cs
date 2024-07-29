@@ -3,31 +3,6 @@ namespace FactorySimulation.Tests;
 public class ResourceTransformerInfoTests
 {
     [Fact]
-    public void JsonConvert()
-    {
-        var res = new ResourceTransformerInfo(
-            "Machine1",
-            InputResources: new[]{
-                ("A",1L),
-                ("B",2)
-            },
-            OutputResources: new[]{
-                ("C",3L),
-                ("D",2),
-            },
-            Time: 2,
-            Cost: 4
-        );
-
-        var json = res.ToJson();
-        var converted = ResourceTransformerInfo.FromJson(json);
-        Assert.Equal(res.Transformer, converted.Transformer);
-        Assert.Equal(res.InputResources, converted.InputResources);
-        Assert.Equal(res.OutputResources, converted.OutputResources);
-        Assert.Equal(res.Time, converted.Time);
-        Assert.Equal(res.Cost, converted.Cost);
-    }
-    [Fact]
     public void JsonConvertMany()
     {
         var res1 = new ResourceTransformerInfo(

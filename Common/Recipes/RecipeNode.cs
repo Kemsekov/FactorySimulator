@@ -23,7 +23,11 @@ public class RecipeNode : Node
     /// </summary>
     public double Amount{get;set;}
     /// <summary>
+    /// Amount variable that is used by solver
+    /// </summary>
+    public Variable AmountVariable{get;set;}
+    /// <summary>
     /// Max possible amount of this machine
     /// </summary>
-    public double MaxAmount{get;set;} = int.MaxValue;
+    public double MaxAmount=>Recipe.MaxAmount;
 }

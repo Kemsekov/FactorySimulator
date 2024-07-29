@@ -5,6 +5,13 @@ namespace FactorySimulation.Interfaces;
 public interface IResourceTransformerInfo
 {
     /// <summary>
+    /// Max possible amount of this transformation happening at the same time. 
+    /// So if your recipe requires crafting table, and you may need to scale production using not one, 
+    /// but 10 crafting tables, you then can limit how much such "crafting tables" 
+    /// can be used at the same time in this particular recipe.
+    /// </summary>
+    public double MaxAmount {get;}
+    /// <summary>
     /// Which resources and in what amount is required to do one transformation?
     /// </summary>
     (string resourceName, long amount)[] InputResources { get; }

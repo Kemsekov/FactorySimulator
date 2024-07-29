@@ -10,6 +10,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Single;
 using System.Linq;
 using System.Reflection;
+using static FactorySimulation.ResourceTransformerInfo;
 namespace FactorySimulation;
 public static class RecipePipelineBuilder
 {
@@ -125,13 +126,33 @@ public static class RecipePipelineBuilder
     /// <returns>
     /// Pipeline result
     /// </returns>
-    public static PipelineResult BuildRecipe(this IEnumerable<IResourceTransformerInfo> recipes, IResourceTransformerInfo what, double amount)
+    public static PipelineResult BuildRecipeProduceEnoughObjective(this TransformationsConstraints constraints, IResourceTransformerInfo what, double amount)
     {
-        var G = recipes.ToRecipeGraph(what);
+        var G = constraints.Transformations.ToRecipeGraph(what);
         var whatNode = G.Nodes.First(n => n.Recipe == what);
         var result = BuildRecipe(
             G,
-            (s, totalCost) => ProduceEnoughObjective(whatNode, amount, s, totalCost),
+            (s, totalCost) => ProduceEnoughObjective(whatNode, amount, s, totalCost,constraints.TransformerLimitations,G.Nodes.ToArray()),
+            IntVar,
+            DoubleVar);
+        return result;
+    }
+
+    /// <summary>
+    /// Builds required recipe information of how to reproduce it
+    /// </summary>
+    /// <param name="what">What to reproduce</param>
+    /// <param name="amount">How much to reproduce</param>
+    /// <returns>
+    /// Pipeline result
+    /// </returns>
+    public static PipelineResult BuildRecipeMaximizeAmountWithLimitedCost(this TransformationsConstraints constraints, IResourceTransformerInfo what, double amount)
+    {
+        var G = constraints.Transformations.ToRecipeGraph(what);
+        var whatNode = G.Nodes.First(n => n.Recipe == what);
+        var result = BuildRecipe(
+            G,
+            (s, totalCost) => MaximizeAmountWithLimitedCost(whatNode, amount, s, totalCost,constraints.TransformerLimitations,G.Nodes.ToArray()),
             IntVar,
             DoubleVar);
         return result;
@@ -171,14 +192,14 @@ public static class RecipePipelineBuilder
         var solver = Solver.CreateSolver("SCIP");
 
         foreach (var n in G.Nodes)
-            n["amount"] = amountType(solver);
+            n.AmountVariable = amountType(solver);
 
         foreach (var e in G.Edges)
-            e["flow"] = flowType(solver);
+            e.FlowVariable = flowType(solver);
 
         var nodes = G.Nodes.ToArray();
 
-        var amounts = nodes.Select(n => n.Get<Variable>("amount")).ToArray();
+        var amounts = nodes.Select(n => n.AmountVariable).ToArray();
         var costs = nodes.Select(n => (double)n.Recipe.Cost).ToArray();
 
         var totalCost = amounts.Dot(costs);
@@ -189,7 +210,7 @@ public static class RecipePipelineBuilder
             var r = n.Recipe;
             var timeToProcess = r.Time;
 
-            var nAmount = n.Get<Variable>("amount");
+            var nAmount = n.AmountVariable;
             var nAmountInSec = nAmount * 1.0 / timeToProcess;
 
             var outE = G.Edges.OutEdges(n.Id);
@@ -200,7 +221,7 @@ public static class RecipePipelineBuilder
                 .Select(e => new
                 {
                     Name = e.Resource,
-                    Flow = e.Get<Variable>("flow"),
+                    Flow = e.FlowVariable,
                     Cost = e.Cost
                 })
                 .GroupBy(e => e.Name)
@@ -211,7 +232,7 @@ public static class RecipePipelineBuilder
                 .Select(e => new
                 {
                     Name = e.Resource,
-                    Flow = e.Get<Variable>("flow"),
+                    Flow = e.FlowVariable,
                     Cost = e.Cost
                 })
                 .GroupBy(e => e.Name)
@@ -255,13 +276,13 @@ public static class RecipePipelineBuilder
 
         foreach (var e in G.Edges)
         {
-            var flow = e.Get<Variable>("flow");
+            var flow = e.FlowVariable;
             solver.Add(flow <= e.Capacity);
         }
 
         foreach (var n in G.Nodes)
         {
-            var namount = n.Get<Variable>("amount");
+            var namount = n.AmountVariable;
             solver.Add(namount <= n.MaxAmount);
         }
 
@@ -274,11 +295,11 @@ public static class RecipePipelineBuilder
 
         foreach (var n in G.Nodes)
         {
-            n.Amount = n.Get<Variable>("amount").SolutionValue();
+            n.Amount = n.AmountVariable.SolutionValue();
         }
         foreach (var e in G.Edges)
         {
-            e.Flow = e.Get<Variable>("flow").SolutionValue();
+            e.Flow = e.FlowVariable.SolutionValue();
         }
 
         var resultGraph = G.CloneJustConfiguration();
@@ -312,22 +333,37 @@ public static class RecipePipelineBuilder
     {
         return s.MakeNumVar(0, double.MaxValue, "");
     }
-
-    /// <summary>
-    /// This is objective that forces to produce enough amount of required recipe.
-    /// </summary>
-    public static void ProduceEnoughObjective(Node what, double amount, Solver solver, Google.OrTools.LinearSolver.LinearExpr totalCost)
+    private static void LimitTransformers(Solver solver, TransformerLimitation[] limitations, RecipeNode[] allNodes)
     {
-        var whatAmount = what.Get<Variable>("amount");
+        var limits = limitations.ToDictionary(v => v.Transformer);
+        var used = allNodes.GroupBy(v => v.Recipe.Transformer);
+        foreach (var group in used)
+        {
+            var transformer = group.First().Recipe.Transformer;
+            if(!limits.ContainsKey(transformer)) continue;
+            var limit = limits[transformer];
+            var sum = group.Select(n => n.AmountVariable).Sum();
+            solver.Add(sum <= limit.MaxAmount);
+        }
+    }
+    /// <summary>
+    /// This is objective that tries to minimize cost while forcing to produce enough amount of required recipe.
+    /// </summary>
+    public static void ProduceEnoughObjective(RecipeNode what, double amount, Solver solver, Google.OrTools.LinearSolver.LinearExpr totalCost, TransformerLimitation[] limitations, RecipeNode[] allNodes)
+    {
+        LimitTransformers(solver, limitations, allNodes);
+
+        var whatAmount = what.AmountVariable;
         solver.Add(whatAmount >= amount);
         solver.Minimize(totalCost);
     }
     /// <summary>
     /// This is objective that maximizes amount of `what` node recipe production meanwhile limiting the cost
     /// </summary>
-    public static void MaximizeAmountWithLimitedCost(Node what, double maxCost, Solver solver, Google.OrTools.LinearSolver.LinearExpr totalCost)
+    public static void MaximizeAmountWithLimitedCost(RecipeNode what, double maxCost, Solver solver, Google.OrTools.LinearSolver.LinearExpr totalCost,TransformerLimitation[] limitations, RecipeNode[] allNodes)
     {
-        var whatAmount = what.Get<Variable>("amount");
+        LimitTransformers(solver, limitations, allNodes);
+        var whatAmount = what.AmountVariable;
         solver.Add(totalCost <= maxCost);
         solver.Maximize(whatAmount);
     }

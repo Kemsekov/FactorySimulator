@@ -1,491 +1,526 @@
-[
-    {
-        "Transformer": "Compressor",
-        "InputResources": [
-            [
-                "bronze ingot",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "bronze plate",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Crafting table",
-        "InputResources": [
-            [
-                "copper rotor",
-                2
+{
+    "TransformersLimitations":[
+        {
+            "Transformer" : "Compressor",
+            "MaxAmount" : 20
+        },
+        {
+            "Transformer" : "Crafting table",
+            "MaxAmount" : 20
+        },
+        {
+            "Transformer" : "Cutting machine",
+            "MaxAmount" : 20
+        }
+    ],
+    "Transformations": [
+        {
+            "MaxAmount": 5,
+            "Transformer": "Compressor",
+            "InputResources": [
+                [
+                    "bronze ingot",
+                    1
+                ]
             ],
-            [
-                "glass pane",
-                2
+            "OutputResources": [
+                [
+                    "bronze plate",
+                    1
+                ]
             ],
-            [
-                "bronze curved plate",
-                6
-            ]
-        ],
-        "OutputResources": [
-            [
-                "fluid pipe",
-                16
-            ]
-        ],
-        "Time": 3,
-        "Cost": 7
-    },
-    {
-        "Transformer": "Cutting machine",
-        "InputResources": [
-            [
-                "copper rod",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "copper bolt",
-                2
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Crafting table",
-        "InputResources": [
-            [
-                "bronze drill head",
-                1
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Crafting table",
+            "InputResources": [
+                [
+                    "copper rotor",
+                    2
+                ],
+                [
+                    "glass pane",
+                    2
+                ],
+                [
+                    "bronze curved plate",
+                    6
+                ]
             ],
-            [
-                "iron gear",
-                2
+            "OutputResources": [
+                [
+                    "fluid pipe",
+                    16
+                ]
             ],
-            [
-                "item pipe",
-                1
+            "Time": 3,
+            "Cost": 7
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Cutting machine",
+            "InputResources": [
+                [
+                    "copper rod",
+                    1
+                ]
             ],
-            [
-                "fluid pipe",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "bronze drill",
-                4
-            ]
-        ],
-        "Time": 10,
-        "Cost": 5
-    },
-    {
-        "Transformer": "Raw resource",
-        "InputResources": [
-            [
-                "bronze ingot",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "bronze ingot",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Compressor",
-        "InputResources": [
-            [
-                "copper plate",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "copper curved plate",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Crafting table",
-        "InputResources": [
-            [
-                "copper curved plate",
-                2
+            "OutputResources": [
+                [
+                    "copper bolt",
+                    2
+                ]
             ],
-            [
-                "copper rod",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "copper blade",
-                4
-            ]
-        ],
-        "Time": 1,
-        "Cost": 2
-    },
-    {
-        "Transformer": "Compressor",
-        "InputResources": [
-            [
-                "iron ingot",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "iron plate",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Raw resource",
-        "InputResources": [
-            [
-                "glass",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "glass",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Raw resource",
-        "InputResources": [
-            [
-                "soldering alloy",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "soldering alloy",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Cutting machine",
-        "InputResources": [
-            [
-                "iron ingot",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "iron rod",
-                2
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Crafting table",
-        "InputResources": [
-            [
-                "copper blade",
-                4
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Crafting table",
+            "InputResources": [
+                [
+                    "bronze drill head",
+                    1
+                ],
+                [
+                    "iron gear",
+                    2
+                ],
+                [
+                    "item pipe",
+                    1
+                ],
+                [
+                    "fluid pipe",
+                    1
+                ]
             ],
-            [
-                "copper bolt",
-                4
+            "OutputResources": [
+                [
+                    "bronze drill",
+                    4
+                ]
             ],
-            [
-                "copper ring",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "copper rotor",
-                1
-            ]
-        ],
-        "Time": 4,
-        "Cost": 6
-    },
-    {
-        "Transformer": "Crafting table",
-        "InputResources": [
-            [
-                "iron plate",
-                4
+            "Time": 10,
+            "Cost": 5
+        },
+        {
+            "Transformer": "Raw resource",
+            "InputResources": [
+                [
+                    "bronze ingot",
+                    1
+                ]
             ],
-            [
-                "iron ring",
-                1
+            "OutputResources": [
+                [
+                    "bronze ingot",
+                    1
+                ]
             ],
-            [
-                "soldering alloy",
-                100
-            ]
-        ],
-        "OutputResources": [
-            [
-                "iron gear",
-                2
-            ]
-        ],
-        "Time": 2,
-        "Cost": 4
-    },
-    {
-        "Transformer": "Cutting machine",
-        "InputResources": [
-            [
-                "copper ingot",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "copper rod",
-                2
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Compressor",
-        "InputResources": [
-            [
-                "bronze rod",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "bronze ring",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Crafting table",
-        "InputResources": [
-            [
-                "bronze plate",
-                4
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Compressor",
+            "InputResources": [
+                [
+                    "copper plate",
+                    1
+                ]
             ],
-            [
-                "bronze ring",
-                1
+            "OutputResources": [
+                [
+                    "copper curved plate",
+                    1
+                ]
             ],
-            [
-                "soldering alloy",
-                100
-            ]
-        ],
-        "OutputResources": [
-            [
-                "bronze gear",
-                2
-            ]
-        ],
-        "Time": 3,
-        "Cost": 2
-    },
-    {
-        "Transformer": "Cutting machine",
-        "InputResources": [
-            [
-                "bronze ingot",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "bronze rod",
-                2
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Crafting table",
-        "InputResources": [
-            [
-                "glass",
-                6
-            ]
-        ],
-        "OutputResources": [
-            [
-                "glass pane",
-                16
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Compressor",
-        "InputResources": [
-            [
-                "bronze plate",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "bronze curved plate",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Compressor",
-        "InputResources": [
-            [
-                "iron rod",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "iron ring",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Raw resource",
-        "InputResources": [
-            [
-                "copper ingot",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "copper ingot",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Raw resource",
-        "InputResources": [
-            [
-                "iron ingot",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "iron ingot",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Compressor",
-        "InputResources": [
-            [
-                "copper ingot",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "copper plate",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Compressor",
-        "InputResources": [
-            [
-                "copper rod",
-                1
-            ]
-        ],
-        "OutputResources": [
-            [
-                "copper ring",
-                1
-            ]
-        ],
-        "Time": 1,
-        "Cost": 1
-    },
-    {
-        "Transformer": "Crafting table",
-        "InputResources": [
-            [
-                "bronze plate",
-                1
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Crafting table",
+            "InputResources": [
+                [
+                    "copper curved plate",
+                    2
+                ],
+                [
+                    "copper rod",
+                    1
+                ]
             ],
-            [
-                "bronze curved plate",
-                2
+            "OutputResources": [
+                [
+                    "copper blade",
+                    4
+                ]
             ],
-            [
-                "bronze rod",
-                1
+            "Time": 1,
+            "Cost": 2
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Compressor",
+            "InputResources": [
+                [
+                    "iron ingot",
+                    1
+                ]
             ],
-            [
-                "bronze gear",
-                2
+            "OutputResources": [
+                [
+                    "iron plate",
+                    1
+                ]
             ],
-            [
-                "soldering alloy",
-                75
-            ]
-        ],
-        "OutputResources": [
-            [
-                "bronze drill head",
-                1
-            ]
-        ],
-        "Time": 10,
-        "Cost": 8
-    }
-]
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "Transformer": "Raw resource",
+            "InputResources": [
+                [
+                    "glass",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "glass",
+                    1
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "Transformer": "Raw resource",
+            "InputResources": [
+                [
+                    "soldering alloy",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "soldering alloy",
+                    1
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Cutting machine",
+            "InputResources": [
+                [
+                    "iron ingot",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "iron rod",
+                    2
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Crafting table",
+            "InputResources": [
+                [
+                    "copper blade",
+                    4
+                ],
+                [
+                    "copper bolt",
+                    4
+                ],
+                [
+                    "copper ring",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "copper rotor",
+                    1
+                ]
+            ],
+            "Time": 4,
+            "Cost": 6
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Crafting table",
+            "InputResources": [
+                [
+                    "iron plate",
+                    4
+                ],
+                [
+                    "iron ring",
+                    1
+                ],
+                [
+                    "soldering alloy",
+                    100
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "iron gear",
+                    2
+                ]
+            ],
+            "Time": 2,
+            "Cost": 4
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Cutting machine",
+            "InputResources": [
+                [
+                    "copper ingot",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "copper rod",
+                    2
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Compressor",
+            "InputResources": [
+                [
+                    "bronze rod",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "bronze ring",
+                    1
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Crafting table",
+            "InputResources": [
+                [
+                    "bronze plate",
+                    4
+                ],
+                [
+                    "bronze ring",
+                    1
+                ],
+                [
+                    "soldering alloy",
+                    100
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "bronze gear",
+                    2
+                ]
+            ],
+            "Time": 3,
+            "Cost": 2
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Cutting machine",
+            "InputResources": [
+                [
+                    "bronze ingot",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "bronze rod",
+                    2
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Crafting table",
+            "InputResources": [
+                [
+                    "glass",
+                    6
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "glass pane",
+                    16
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Compressor",
+            "InputResources": [
+                [
+                    "bronze plate",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "bronze curved plate",
+                    1
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Compressor",
+            "InputResources": [
+                [
+                    "iron rod",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "iron ring",
+                    1
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "Transformer": "Raw resource",
+            "InputResources": [
+                [
+                    "copper ingot",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "copper ingot",
+                    1
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "Transformer": "Raw resource",
+            "InputResources": [
+                [
+                    "iron ingot",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "iron ingot",
+                    1
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Compressor",
+            "InputResources": [
+                [
+                    "copper ingot",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "copper plate",
+                    1
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "Transformer": "Compressor",
+            "InputResources": [
+                [
+                    "copper rod",
+                    1
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "copper ring",
+                    1
+                ]
+            ],
+            "Time": 1,
+            "Cost": 1
+        },
+        {
+            "MaxAmount": 5,
+            "Transformer": "Crafting table",
+            "InputResources": [
+                [
+                    "bronze plate",
+                    1
+                ],
+                [
+                    "bronze curved plate",
+                    2
+                ],
+                [
+                    "bronze rod",
+                    1
+                ],
+                [
+                    "bronze gear",
+                    2
+                ],
+                [
+                    "soldering alloy",
+                    75
+                ]
+            ],
+            "OutputResources": [
+                [
+                    "bronze drill head",
+                    1
+                ]
+            ],
+            "Time": 10,
+            "Cost": 8
+        }
+    ]
+}
